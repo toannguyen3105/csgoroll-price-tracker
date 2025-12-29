@@ -21,6 +21,15 @@ export interface TelegramConfig {
     chatId: string;
 }
 
+export interface LiveItem {
+    id: string;
+    name: string;
+    price: number;
+    markup: number;
+    isMatch: boolean;
+    timestamp: string;
+}
+
 export type Language = 'en' | 'vi';
 
 interface ConfigState {
@@ -29,6 +38,7 @@ interface ConfigState {
     telegram: TelegramConfig;
     isCrawling: boolean;
     logs: string[];
+    liveResults: LiveItem[];
     language: Language;
     _hasHydrated: boolean;
 
@@ -41,6 +51,8 @@ interface ConfigState {
     setLogs: (message: string) => void;
     clearLogs: () => void;
     setCrawlingStatus: (status: boolean) => void;
+    addLiveResult: (item: LiveItem) => void;
+    clearLiveResults: () => void;
     setLanguage: (lang: Language) => void;
     setHasHydrated: (state: boolean) => void;
 }
@@ -53,6 +65,7 @@ export const useConfigStore = create<ConfigState>()(
             telegram: { botToken: '', chatId: '' },
             isCrawling: false,
             logs: [],
+            liveResults: [],
             language: 'en',
             _hasHydrated: false,
 
@@ -87,6 +100,13 @@ export const useConfigStore = create<ConfigState>()(
             clearLogs: () => set({ logs: [] }),
 
             setCrawlingStatus: (status) => set({ isCrawling: status }),
+
+            addLiveResult: (item) => set((state) => {
+                const newResults = [item, ...state.liveResults].slice(0, 200);
+                return { liveResults: newResults };
+            }),
+
+            clearLiveResults: () => set({ liveResults: [] }),
 
             setLanguage: (lang) => {
                 set({ language: lang });

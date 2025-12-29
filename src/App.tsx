@@ -5,7 +5,10 @@ import { IntervalSettings } from './components/IntervalSettings';
 import { TelegramConfig } from './components/TelegramConfig';
 import { TargetItemManager } from './components/TargetItemManager';
 import { storageHelper } from './storage_helper';
-import { CrawlFeed } from './components/CrawlFeed';
+import { LiveDataTableContainer } from './components/DataTable/LiveDataTableContainer';
+import { LanguageSwitcher } from './components/LanguageSwitcher';
+import { useConfigStore } from '@/store/useConfigStore';
+import { useCrawlerListener } from '@/hooks/useCrawlerListener';
 import type { AppState, PriceRange, Intervals, TelegramConfig as ITelegramConfig, TargetItem } from './types';
 import { Save, Loader2, Settings, List } from 'lucide-react';
 import './i18n/config'; // Init i18n
@@ -17,7 +20,13 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
 
-  // State
+  // Hydration check from store
+  const _hasHydrated = useConfigStore(state => state._hasHydrated);
+
+  // Activate Crawler Listener
+  useCrawlerListener();
+
+  // State (Syncing with local storage helper for legacy support, but moving towards store)
   const [priceRanges, setPriceRanges] = useState<PriceRange[]>([]);
   const [intervals, setIntervals] = useState<Intervals>({ rangeInterval: 10, batchInterval: 10, cycleDelay: 1.1 });
   const [telegramConfig, setTelegramConfig] = useState<ITelegramConfig>({
@@ -46,8 +55,6 @@ function App() {
   const handleSaveSettings = async () => {
     setSaveStatus('saving');
     try {
-      // We explicitly save settings here. Target items are auto-saved by their manager, 
-      // but including them here ensures consistency if needed, though they manage their own persistence key.
       const state: AppState = {
         priceRanges,
         intervals,
@@ -63,7 +70,8 @@ function App() {
     }
   };
 
-  if (loading) {
+  // Wait for both local async load and Zustand hydration
+  if (loading || !_hasHydrated) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="animate-spin text-blue-500" size={32} />
@@ -82,6 +90,7 @@ function App() {
               <h1 className="text-xl font-bold text-gray-800">Crawler Config</h1>
               <p className="text-xs text-gray-500">CSGORoll Price Tracker</p>
             </div>
+            <LanguageSwitcher />
           </header>
 
           {/* Tabs */}
@@ -153,7 +162,7 @@ function App() {
 
         {/* Right Panel: Feed */}
         <div className="h-full bg-white">
-          <CrawlFeed />
+          <LiveDataTableContainer />
         </div>
       </div>
     </QueryClientProvider>

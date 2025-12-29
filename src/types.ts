@@ -16,9 +16,13 @@ export interface TelegramConfig {
 }
 
 export interface TargetItem {
+    id: string;
     name: string;
-    price: number;
-    enabled: boolean;
+    targetPrice: number;
+    isActive: boolean;
+    enabled?: boolean; // legacy support
+    price?: number;    // legacy support
+    createdAt?: number;
 }
 
 export interface LogItem {

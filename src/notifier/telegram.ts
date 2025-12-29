@@ -59,7 +59,7 @@ export const sendTelegramAlert = async (item: TradeItem, config: TelegramConfig,
 
         if (!response.ok) {
             const errorData = await response.json();
-            console.error('Telegram API Error:', errorData);
+            console.error('Telegram API Error:', JSON.stringify(errorData, null, 2));
         }
     } catch (error) {
         console.error('Failed to send Telegram alert:', error);

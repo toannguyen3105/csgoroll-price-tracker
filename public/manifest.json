@@ -8,7 +8,9 @@
     ],
     "host_permissions": [
         "https://api.telegram.org/*",
-        "https://www.csgoroll.com/*"
+        "https://www.csgoroll.com/*",
+        "https://router.csgoroll.com/*",
+        "https://api.csgoroll.com/*"
     ],
     "background": {
         "service_worker": "background.js",
@@ -16,6 +18,6 @@
     },
     "options_page": "index.html",
     "action": {
-        "default_popup": "index.html"
+        "default_title": "CSGORoll Price Tracker Crawler"
     }
 }

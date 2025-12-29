@@ -21,6 +21,15 @@ export interface TargetItem {
     enabled: boolean;
 }
 
+export interface LogItem {
+    id: string;
+    name: string;
+    price: number;
+    markup?: number;
+    timestamp: number;
+    isTarget: boolean;
+}
+
 export interface AppState {
     priceRanges: PriceRange[];
     intervals: Intervals;

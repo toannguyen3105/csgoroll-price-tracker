@@ -1,0 +1,33 @@
+{
+    "common": {
+        "save": "Lưu",
+        "saved": "Đã lưu",
+        "cancel": "Hủy",
+        "test": "Kiểm tra",
+        "delete": "Xóa",
+        "edit": "Sửa",
+        "settings": "Cài đặt",
+        "targets": "Danh sách theo dõi",
+        "dashboard": "Bảng điều khiển"
+    },
+    "settings": {
+        "price_ranges": "Khoảng giá",
+        "range_interval": "Khoảng thời gian quét (giây)",
+        "batch_interval": "Khoảng thời gian lô (giây)",
+        "cycle_delay": "Độ trễ chu kỳ (phút)",
+        "tg_config": "Cấu hình Telegram",
+        "bot_token": "Bot Token",
+        "chat_id": "Chat ID",
+        "test_alert": "Gửi thông báo thử"
+    },
+    "targets": {
+        "add_item": "Thêm vật phẩm mới",
+        "item_name": "Tên vật phẩm (Chính xác)",
+        "target_price": "Giá mục tiêu",
+        "no_items": "Chưa có vật phẩm nào trong danh sách."
+    },
+    "alerts": {
+        "new_item": "🚨 TÌM THẤY ITEM MỚI!",
+        "view_link": "Xem trên Withdraw"
+    }
+}

@@ -1,24 +1,27 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { chromeStorageWrapper } from '@/utils/chrome-storage-wrapper';
+import i18n from '@/i18n/config';
 
-interface TargetItem {
+export interface TargetItem {
     id: string;
     name: string;
     targetPrice: number;
     isActive: boolean;
 }
 
-interface Intervals {
+export interface Intervals {
     range: number;
     batch: number;
     cycle: number;
 }
 
-interface TelegramConfig {
+export interface TelegramConfig {
     botToken: string;
     chatId: string;
 }
+
+export type Language = 'en' | 'vi';
 
 interface ConfigState {
     targetList: TargetItem[];
@@ -26,6 +29,8 @@ interface ConfigState {
     telegram: TelegramConfig;
     isCrawling: boolean;
     logs: string[];
+    language: Language;
+    _hasHydrated: boolean;
 
     // Actions
     updateIntervals: (newIntervals: Partial<Intervals>) => void;
@@ -36,6 +41,8 @@ interface ConfigState {
     setLogs: (message: string) => void;
     clearLogs: () => void;
     setCrawlingStatus: (status: boolean) => void;
+    setLanguage: (lang: Language) => void;
+    setHasHydrated: (state: boolean) => void;
 }
 
 export const useConfigStore = create<ConfigState>()(
@@ -46,6 +53,8 @@ export const useConfigStore = create<ConfigState>()(
             telegram: { botToken: '', chatId: '' },
             isCrawling: false,
             logs: [],
+            language: 'en',
+            _hasHydrated: false,
 
             updateIntervals: (newIntervals) => set((state) => ({
                 intervals: { ...state.intervals, ...newIntervals }
@@ -78,10 +87,23 @@ export const useConfigStore = create<ConfigState>()(
             clearLogs: () => set({ logs: [] }),
 
             setCrawlingStatus: (status) => set({ isCrawling: status }),
+
+            setLanguage: (lang) => {
+                set({ language: lang });
+                i18n.changeLanguage(lang);
+            },
+
+            setHasHydrated: (state) => set({ _hasHydrated: state }),
         }),
         {
             name: 'crawler-storage',
             storage: createJSONStorage(() => chromeStorageWrapper),
+            onRehydrateStorage: () => (state) => {
+                state?.setHasHydrated(true);
+                if (state && state.language) {
+                    i18n.changeLanguage(state.language);
+                }
+            },
         }
     )
 );

@@ -75,7 +75,6 @@ export class CrawlerEngine {
   ) {
     let hasNextPage = true;
     let cursor: string | null = null;
-    let pageCount = 0;
 
     while (hasNextPage && !this.shouldStop) {
       try {
@@ -98,7 +97,12 @@ export class CrawlerEngine {
             if (!itemName) continue;
 
             await processItemMatch(
-              { tradeValue, itemName, itemId: item.id, markup: item.markup },
+              {
+                tradeValue,
+                itemName,
+                itemId: item.id,
+                markup: item.markupPercent,
+              },
               targetItems,
               this.processedItems,
               telegramConfig,
@@ -109,7 +113,6 @@ export class CrawlerEngine {
 
         hasNextPage = trades.pageInfo?.hasNextPage;
         cursor = trades.pageInfo?.endCursor;
-        pageCount++;
 
         if (hasNextPage) {
           await sleep(intervals.batchInterval * 1000);

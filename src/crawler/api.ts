@@ -4,11 +4,41 @@ export const CSGOROLL_GRAPHQL_URL = "https://router.csgoroll.com/graphql";
 const QUERY_HASH =
   "3b2f3093415f02ea554035c1d0f102ce588fe31060cbac268b21d139bdb9c25e";
 
+export interface TradeItem {
+  id: string;
+  marketName: string;
+}
+
+export interface TradeNode {
+  id: string;
+  totalValue: number;
+  markupPercent: number;
+  tradeItems: TradeItem[];
+}
+
+export interface PageInfo {
+  startCursor: string;
+  endCursor: string;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
+
+export interface CrawlerResponse {
+  data: {
+    trades: {
+      edges: {
+        node: TradeNode;
+      }[];
+      pageInfo: PageInfo;
+    };
+  };
+}
+
 export const fetchItems = async (
   min: number,
   max: number,
   cursor: string | null = null,
-) => {
+): Promise<CrawlerResponse> => {
   const variables = {
     first: 50,
     orderBy: "TOTAL_VALUE_DESC",
@@ -50,7 +80,7 @@ export const fetchItems = async (
     }
 
     const data = await response.json();
-    return data;
+    return data as CrawlerResponse;
   } catch (error) {
     console.error("Fetch error:", error);
     throw error;

@@ -55,7 +55,7 @@ export const processItemMatch = async (
           name: ctx.itemName,
           price: trackedPrice,
           markup: ctx.markup,
-          timestamp: Date.now(),
+          timestamp: new Date().toISOString(),
           isTarget: isMatch,
         },
       },
@@ -66,7 +66,7 @@ export const processItemMatch = async (
         }
       },
     );
-  } catch (err) {
+  } catch {
     // Ignore extension context invalidated errors
   }
 

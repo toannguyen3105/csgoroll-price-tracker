@@ -11,7 +11,7 @@ import {
   TargetItemManager,
   TelegramConfig,
 } from "@/components";
-import { useCrawlerListener, useWithdrawQuery } from "@/hooks";
+import { useCrawlerListener } from "@/hooks";
 import "@/i18n";
 import { storageHelper } from "@/storage_helper";
 import { useConfigStore } from "@/store";
@@ -26,6 +26,8 @@ import type {
 } from "@/types";
 import { cn } from "@/utils";
 
+import { CRAWLER_COMMANDS } from "@/constants";
+
 const App = () => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<AppTab>("settings");
@@ -37,7 +39,6 @@ const App = () => {
   const setCrawlingStatus = useConfigStore((state) => state.setCrawlingStatus);
 
   useCrawlerListener();
-  useWithdrawQuery();
 
   const [priceRanges, setPriceRanges] = useState<PriceRange[]>([]);
   const [intervals, setIntervals] = useState<Intervals>({
@@ -101,6 +102,17 @@ const App = () => {
     );
   }
 
+  const toggleCrawler = () => {
+    const newStatus = !isCrawling;
+    setCrawlingStatus(newStatus);
+
+    if (chrome && chrome.runtime) {
+      chrome.runtime.sendMessage({
+        command: newStatus ? CRAWLER_COMMANDS.START : CRAWLER_COMMANDS.STOP,
+      });
+    }
+  };
+
   return (
     <div className="flex h-screen w-full bg-slate-950 text-slate-200 overflow-hidden">
       {/* Sidebar */}
@@ -159,7 +171,7 @@ const App = () => {
 
         <footer className="bg-slate-900 border-t border-slate-800 px-4 py-4 shrink-0">
           <button
-            onClick={() => setCrawlingStatus(!isCrawling)}
+            onClick={toggleCrawler}
             className={cn(
               "w-full flex items-center justify-center gap-2 py-3 rounded-lg text-sm font-bold tracking-wide transition-all transform active:scale-[0.98] shadow-lg border",
               isCrawling

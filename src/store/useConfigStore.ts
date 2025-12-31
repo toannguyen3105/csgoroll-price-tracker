@@ -115,6 +115,13 @@ export const useConfigStore = create<ConfigState>()(
     {
       name: "crawler-storage",
       storage: createJSONStorage(() => chromeStorageWrapper),
+      partialize: (state) => ({
+        targetItems: state.targetItems,
+        intervals: state.intervals,
+        telegram: state.telegram,
+        logs: state.logs,
+        language: state.language,
+      }),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
         if (state && state.language) {

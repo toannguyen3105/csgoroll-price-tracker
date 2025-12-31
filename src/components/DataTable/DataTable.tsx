@@ -9,7 +9,7 @@ import {
 import type { ColumnDef, SortingState } from "@tanstack/react-table";
 import { DataTableToolbar } from "./TableToolbar";
 import { DataTableRow } from "./TableRows";
-import type { LiveItem } from "@/store/useConfigStore";
+import type { LiveItem } from "@/types";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -58,7 +58,7 @@ export function DataTable<TData extends LiveItem, TValue>({
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext(),
+                            header.getContext()
                           )}
                     </th>
                   );

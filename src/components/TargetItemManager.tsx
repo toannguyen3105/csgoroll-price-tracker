@@ -6,6 +6,7 @@ import type { TargetItem } from "@/types";
 import { useConfigStore } from "@/store/useConfigStore";
 import { storageHelper } from "@/storage_helper";
 import { TargetListTable } from "./TargetListTable";
+import { cn } from "@/utils/cn";
 
 interface Props {
   targetItems: TargetItem[];
@@ -140,7 +141,13 @@ export const TargetItemManager: React.FC<Props> = ({
   return (
     <div className="h-full flex flex-col gap-4 p-4 lg:p-6 overflow-hidden">
       {/* Creation Card */}
-      <div className="bg-slate-900/60 backdrop-blur-md border border-white/5 rounded-xl p-5 shadow-xl shrink-0 max-w-4xl mx-auto w-full">
+      {/* Creation Card */}
+      <div
+        className={cn(
+          "bg-slate-900/60 backdrop-blur-md border border-white/5 rounded-xl p-5 shadow-xl",
+          "shrink-0 max-w-4xl mx-auto w-full"
+        )}
+      >
         <div className="flex items-center gap-2 mb-4">
           <div className="p-2 bg-cyan-500/10 rounded-lg">
             <Plus size={20} className="text-cyan-400" />
@@ -157,7 +164,11 @@ export const TargetItemManager: React.FC<Props> = ({
               placeholder={t("targets.item_name_placeholder")}
               value={newItemName}
               onChange={(e) => setNewItemName(e.target.value)}
-              className="w-full px-4 py-3 bg-slate-950/50 border border-slate-700/50 rounded-lg text-slate-200 focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 placeholder-slate-600 transition-all"
+              className={cn(
+                "w-full px-4 py-3 bg-slate-950/50 border border-slate-700/50 rounded-lg",
+                "text-slate-200 placeholder-slate-600 transition-all",
+                "focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20"
+              )}
             />
             <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-cyan-500/0 via-cyan-500/0 to-cyan-500/5 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity" />
           </div>
@@ -168,13 +179,22 @@ export const TargetItemManager: React.FC<Props> = ({
               value={newItemPrice}
               onChange={(e) => setNewItemPrice(e.target.value)}
               step="0.01"
-              className="w-full px-4 py-3 bg-slate-950/50 border border-slate-700/50 rounded-lg text-slate-200 focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 placeholder-slate-600 transition-all font-mono"
+              className={cn(
+                "w-full px-4 py-3 bg-slate-950/50 border border-slate-700/50 rounded-lg",
+                "text-slate-200 placeholder-slate-600 transition-all font-mono",
+                "focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20"
+              )}
             />
           </div>
           <button
             type="submit"
             disabled={!newItemName || !newItemPrice}
-            className="px-8 py-3 bg-cyan-600 text-white rounded-lg text-sm font-bold uppercase tracking-wider hover:bg-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-cyan-900/20 hover:shadow-cyan-500/20 hover:translate-y-[-1px] active:translate-y-[0px]"
+            className={cn(
+              "px-8 py-3 bg-cyan-600 text-white rounded-lg text-sm font-bold uppercase tracking-wider",
+              "hover:bg-cyan-500 transition-all shadow-lg shadow-cyan-900/20",
+              "hover:shadow-cyan-500/20 hover:translate-y-[-1px] active:translate-y-[0px]",
+              "disabled:opacity-50 disabled:cursor-not-allowed"
+            )}
           >
             {t("targets.add_button")}
           </button>
@@ -182,7 +202,13 @@ export const TargetItemManager: React.FC<Props> = ({
       </div>
 
       {/* Data Panel */}
-      <div className="flex-1 flex flex-col min-h-0 bg-slate-900/60 backdrop-blur-md border border-white/5 rounded-xl shadow-xl overflow-hidden max-w-4xl mx-auto w-full">
+      {/* Data Panel */}
+      <div
+        className={cn(
+          "flex-1 flex flex-col min-h-0 bg-slate-900/60 backdrop-blur-md border border-white/5 rounded-xl shadow-xl",
+          "overflow-hidden max-w-4xl mx-auto w-full"
+        )}
+      >
         {/* Toolbar */}
         <div className="p-4 border-b border-white/5 flex items-center justify-between gap-4 bg-slate-900/30">
           <div className="relative flex-1 max-w-md">
@@ -195,7 +221,11 @@ export const TargetItemManager: React.FC<Props> = ({
               placeholder={t("targets.search_placeholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 text-sm bg-slate-950/50 border border-slate-700/50 rounded-lg text-slate-200 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20 placeholder-slate-600 transition-all"
+              className={cn(
+                "w-full pl-10 pr-4 py-2 text-sm bg-slate-950/50 border border-slate-700/50 rounded-lg",
+                "text-slate-200 placeholder-slate-600 transition-all",
+                "focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20"
+              )}
             />
           </div>
 
@@ -203,7 +233,10 @@ export const TargetItemManager: React.FC<Props> = ({
             <div className="h-6 w-px bg-slate-700/50 mx-2" />
             <button
               onClick={handleDownloadTemplate}
-              className="flex items-center gap-2 px-3 py-2 text-xs font-bold text-cyan-400 bg-cyan-950/20 hover:bg-cyan-900/40 border border-cyan-900/30 rounded-lg transition-colors uppercase tracking-wide group"
+              className={cn(
+                "flex items-center gap-2 px-3 py-2 text-xs font-bold rounded-lg transition-colors uppercase tracking-wide group",
+                "text-cyan-400 bg-cyan-950/20 hover:bg-cyan-900/40 border border-cyan-900/30"
+              )}
               title={t("targets.download_template_title")}
             >
               <Download
@@ -221,7 +254,10 @@ export const TargetItemManager: React.FC<Props> = ({
             />
             <button
               onClick={handleImportClick}
-              className="flex items-center gap-2 px-3 py-2 text-xs font-bold text-emerald-400 bg-emerald-950/20 hover:bg-emerald-900/40 border border-emerald-900/30 rounded-lg transition-colors uppercase tracking-wide group"
+              className={cn(
+                "flex items-center gap-2 px-3 py-2 text-xs font-bold rounded-lg transition-colors uppercase tracking-wide group",
+                "text-emerald-400 bg-emerald-950/20 hover:bg-emerald-900/40 border border-emerald-900/30"
+              )}
               title={t("targets.import_csv_title")}
             >
               <Upload

@@ -2,7 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useConfigStore } from "@/store/useConfigStore";
 import { fetchWithdrawItems } from "@/api/withdrawApi";
 import { useEffect, useRef } from "react";
-import type { LiveItem } from "@/store/useConfigStore";
+import type { LiveItem } from "@/types";
+import { isItemMatch } from "@/crawler";
 
 export const useWithdrawQuery = () => {
   const isCrawling = useConfigStore((state) => state.isCrawling);
@@ -50,15 +51,8 @@ export const useWithdrawQuery = () => {
           const price = node.price.amount;
           const markup = node.markup;
 
-          // Check against Target List
-          const isMatch = targetItems.some(
-            (target) =>
-              target.isActive &&
-              node.marketName
-                .toLowerCase()
-                .includes(target.name.toLowerCase()) &&
-              price <= target.targetPrice,
-          );
+          // Check against Target List using unified logic
+          const isMatch = isItemMatch(node.marketName, price, targetItems);
 
           const liveItem: LiveItem = {
             id: node.id,

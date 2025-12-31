@@ -14,7 +14,9 @@
     "system_active": "Hệ thống hoạt động",
     "live_feed": "Hoạt động",
     "pause": "Tạm dừng",
-    "resume": "Tiếp tục"
+    "resume": "Tiếp tục",
+    "start_crawler": "BẮT ĐẦU CRAWLER",
+    "stop_crawler": "DỪNG CRAWLER"
   },
   "settings": {
     "price_ranges": "Khoảng giá",

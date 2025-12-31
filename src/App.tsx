@@ -1,4 +1,4 @@
-import { Loader2 } from "lucide-react";
+import { Loader2, Play, Pause } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -33,6 +33,8 @@ const App = () => {
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
 
   const _hasHydrated = useConfigStore((state) => state._hasHydrated);
+  const isCrawling = useConfigStore((state) => state.isCrawling);
+  const setCrawlingStatus = useConfigStore((state) => state.setCrawlingStatus);
 
   useCrawlerListener();
   useWithdrawQuery();
@@ -121,6 +123,32 @@ const App = () => {
                 config={telegramConfig}
                 setConfig={setTelegramConfig}
               />
+
+              <div className="pt-4">
+                <button
+                  onClick={handleSaveSettings}
+                  disabled={saveStatus === "saving"}
+                  className={cn(
+                    "w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-bold tracking-wide transition-all transform active:scale-[0.98]",
+                    {
+                      "bg-emerald-600 text-white hover:bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.4)]":
+                        saveStatus === "success",
+                      "bg-rose-600 text-white hover:bg-rose-500 shadow-[0_0_15px_rgba(225,29,72,0.4)]":
+                        saveStatus === "error",
+                      "bg-cyan-600 text-white hover:bg-cyan-500 shadow-[0_0_15px_rgba(8,145,178,0.4)] hover:shadow-[0_0_20px_rgba(8,145,178,0.6)]":
+                        saveStatus !== "success" && saveStatus !== "error",
+                    }
+                  )}
+                >
+                  {saveStatus === "saving" ? (
+                    <Loader2 className="animate-spin" size={18} />
+                  ) : saveStatus === "success" ? (
+                    <span>{t("common.saved")}</span>
+                  ) : (
+                    t("common.save_settings")
+                  )}
+                </button>
+              </div>
             </div>
           ) : (
             <div className="h-full">
@@ -129,33 +157,29 @@ const App = () => {
           )}
         </main>
 
-        {activeTab === "settings" && (
-          <footer className="bg-slate-900 border-t border-slate-800 px-4 py-4 shrink-0">
-            <button
-              onClick={handleSaveSettings}
-              disabled={saveStatus === "saving"}
-              className={cn(
-                "w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-bold tracking-wide transition-all transform active:scale-[0.98]",
-                {
-                  "bg-emerald-600 text-white hover:bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.4)]":
-                    saveStatus === "success",
-                  "bg-rose-600 text-white hover:bg-rose-500 shadow-[0_0_15px_rgba(225,29,72,0.4)]":
-                    saveStatus === "error",
-                  "bg-cyan-600 text-white hover:bg-cyan-500 shadow-[0_0_15px_rgba(8,145,178,0.4)] hover:shadow-[0_0_20px_rgba(8,145,178,0.6)]":
-                    saveStatus !== "success" && saveStatus !== "error",
-                }
-              )}
-            >
-              {saveStatus === "saving" ? (
-                <Loader2 className="animate-spin" size={18} />
-              ) : saveStatus === "success" ? (
-                <span>{t("common.saved")}</span>
-              ) : (
-                t("common.save_settings")
-              )}
-            </button>
-          </footer>
-        )}
+        <footer className="bg-slate-900 border-t border-slate-800 px-4 py-4 shrink-0">
+          <button
+            onClick={() => setCrawlingStatus(!isCrawling)}
+            className={cn(
+              "w-full flex items-center justify-center gap-2 py-3 rounded-lg text-sm font-bold tracking-wide transition-all transform active:scale-[0.98] shadow-lg border",
+              isCrawling
+                ? "bg-rose-950/40 text-rose-400 border-rose-900/50 hover:bg-rose-900/60 hover:text-rose-300 shadow-rose-900/10"
+                : "bg-emerald-950/40 text-emerald-400 border-emerald-900/50 hover:bg-emerald-900/60 hover:text-emerald-300 shadow-emerald-900/10"
+            )}
+          >
+            {isCrawling ? (
+              <>
+                <Pause size={16} className="fill-current" />
+                <span>{t("common.stop_crawler")}</span>
+              </>
+            ) : (
+              <>
+                <Play size={16} className="fill-current" />
+                <span>{t("common.start_crawler")}</span>
+              </>
+            )}
+          </button>
+        </footer>
       </aside>
 
       {/* Main Content Area (Target Manager) */}

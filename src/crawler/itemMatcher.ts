@@ -8,6 +8,22 @@ export interface MatchContext {
   markup: number;
 }
 
+/**
+ * Unified matching logic: EXACT name match (case-insensitive) + Price check
+ */
+export const isItemMatch = (
+  itemName: string,
+  price: number,
+  targetItems: TargetItem[],
+): boolean => {
+  return targetItems.some(
+    (target) =>
+      target.isActive &&
+      target.name.trim().toLowerCase() === itemName.trim().toLowerCase() &&
+      price <= target.targetPrice,
+  );
+};
+
 export const processItemMatch = async (
   ctx: MatchContext,
   targetItems: TargetItem[],
@@ -18,43 +34,58 @@ export const processItemMatch = async (
   // Deduplication
   if (processedItems.has(ctx.itemId)) return;
 
-  const targetMatch = targetItems.find((t) => t.name === ctx.itemName);
   const trackedPrice = ctx.tradeValue;
+  // Use unified helper for boolean check
+  const isMatch = isItemMatch(ctx.itemName, trackedPrice, targetItems);
+  
+  // Find specific target for notification logic
+  const targetMatch = targetItems.find(
+    (t) =>
+      t.isActive &&
+      t.name.trim().toLowerCase() === ctx.itemName.trim().toLowerCase(),
+  );
 
   // Broadcast to UI
   try {
-    chrome.runtime.sendMessage({
-      type: "ITEM_SCANNED",
-      payload: {
-        id: ctx.itemId,
-        name: ctx.itemName,
-        price: trackedPrice,
-        markup: ctx.markup,
-        timestamp: Date.now(),
-        isTarget: !!targetMatch,
+    chrome.runtime.sendMessage(
+      {
+        type: "ITEM_SCANNED",
+        payload: {
+          id: ctx.itemId,
+          name: ctx.itemName,
+          price: trackedPrice,
+          markup: ctx.markup,
+          timestamp: Date.now(),
+          isTarget: isMatch,
+        },
       },
-    });
+      () => {
+        // Suppress "Receiving end does not exist" error when popup is closed
+        if (chrome.runtime.lastError) {
+          // ignore
+        }
+      },
+    );
   } catch (err) {
     // Ignore extension context invalidated errors
   }
 
-  if (targetMatch) {
-    if (targetMatch.isActive && trackedPrice <= targetMatch.targetPrice) {
-      processedItems.add(ctx.itemId);
+  if (isMatch && targetMatch) {
+    processedItems.add(ctx.itemId);
 
-      const alertItem = {
-        id: ctx.itemId,
-        price: trackedPrice,
-        markup: ctx.markup,
-        assets: [{ name: ctx.itemName }],
-      };
+    const alertItem = {
+      id: ctx.itemId,
+      price: trackedPrice,
+      markup: ctx.markup,
+      assets: [{ name: ctx.itemName }],
+    };
 
-      await sendTelegramAlert(alertItem, telegramConfig, {
-        type: "TARGET",
-        targetPrice: targetMatch.targetPrice,
-      });
-    }
+    await sendTelegramAlert(alertItem, telegramConfig, {
+      type: "TARGET",
+      targetPrice: targetMatch.targetPrice,
+    });
   } else {
+    // General range tracking
     if (trackedPrice >= range.min && trackedPrice <= range.max) {
       processedItems.add(ctx.itemId);
     }

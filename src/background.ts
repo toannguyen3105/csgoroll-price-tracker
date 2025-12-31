@@ -1,4 +1,4 @@
-import { crawler } from "./crawler/engine";
+import { crawler } from "@/crawler";
 
 console.log("Background Service Worker Loaded");
 

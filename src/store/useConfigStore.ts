@@ -8,16 +8,10 @@ import type {
   TelegramConfig,
   LogEntry,
   Language,
+  LiveItem,
 } from "@/types";
 
-export interface LiveItem {
-  id: string;
-  name: string;
-  price: number;
-  markup: number;
-  isMatch: boolean;
-  timestamp: string;
-}
+
 
 interface ConfigState {
   targetItems: TargetItem[];

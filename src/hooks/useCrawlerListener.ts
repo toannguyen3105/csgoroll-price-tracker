@@ -1,13 +1,14 @@
 import { useEffect } from "react";
-import { useConfigStore } from "@/store/useConfigStore";
-import type { LiveItem } from "@/store/useConfigStore";
+
+import { useConfigStore } from "@/store";
+import type { LiveItem, RuntimeMessage } from "@/types";
 
 export const useCrawlerListener = () => {
   const addLiveResult = useConfigStore((state) => state.addLiveResult);
 
   useEffect(() => {
-    const handleMessage = (message: any) => {
-      if (message.type === "ITEM_SCANNED") {
+    const handleMessage = (message: RuntimeMessage) => {
+      if (message && message.type === "ITEM_SCANNED") {
         // Ensure payload matches LiveItem structure
         const payload = message.payload;
 

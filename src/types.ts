@@ -53,3 +53,28 @@ export interface LogEntry {
 }
 
 export type Language = "en" | "vi";
+
+export interface LiveItem {
+  id: string;
+  name: string;
+  price: number;
+  markup: number;
+  isMatch: boolean;
+  timestamp: string;
+}
+
+export interface ScannedItemPayload {
+  id?: string;
+  name?: string;
+  price?: number | string;
+  markup?: number | string;
+  isTarget?: boolean;
+  timestamp?: string;
+}
+
+export interface ItemScannedMessage {
+  type: "ITEM_SCANNED";
+  payload: ScannedItemPayload;
+}
+
+export type RuntimeMessage = ItemScannedMessage;

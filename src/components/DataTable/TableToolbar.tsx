@@ -12,7 +12,7 @@ export function DataTableToolbar<TData>({
     table.getState().globalFilter && table.getState().globalFilter.length > 0;
 
   return (
-    <div className="flex items-center justify-between p-4 border-b border-slate-800 bg-slate-900/50 backdrop-blur-md">
+    <div className="flex items-center justify-between p-4 border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-10">
       <div className="flex flex-1 items-center space-x-2">
         <div className="relative w-full max-w-sm">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-500" />
@@ -30,15 +30,6 @@ export function DataTableToolbar<TData>({
               <X size={16} />
             </button>
           )}
-        </div>
-      </div>
-
-      <div className="flex items-center gap-2">
-        <div className="flex items-center gap-1.5 px-3 py-1 bg-slate-800 rounded-full border border-slate-700">
-          <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
-          <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wide">
-            Live Feed
-          </span>
         </div>
       </div>
     </div>

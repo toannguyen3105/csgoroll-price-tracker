@@ -14,7 +14,9 @@
     "system_active": "System Active",
     "live_feed": "Live Feed",
     "pause": "Pause",
-    "resume": "Resume"
+    "resume": "Resume",
+    "start_crawler": "START CRAWLER",
+    "stop_crawler": "STOP CRAWLER"
   },
   "settings": {
     "price_ranges": "Price Ranges",

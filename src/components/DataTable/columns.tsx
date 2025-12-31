@@ -1,7 +1,8 @@
 import type { ColumnDef } from "@tanstack/react-table";
-import type { LiveItem } from "@/store/useConfigStore";
-import { cn } from "@/utils";
 import { ArrowUpDown } from "lucide-react";
+
+import type { LiveItem } from "@/types";
+import { cn } from "@/utils";
 
 export const columns: ColumnDef<LiveItem>[] = [
   {

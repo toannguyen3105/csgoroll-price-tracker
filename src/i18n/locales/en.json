@@ -1,33 +1,33 @@
 {
-    "common": {
-        "save": "Save",
-        "saved": "Saved",
-        "cancel": "Cancel",
-        "test": "Test",
-        "delete": "Delete",
-        "edit": "Edit",
-        "settings": "Settings",
-        "targets": "Target List",
-        "dashboard": "Dashboard"
-    },
-    "settings": {
-        "price_ranges": "Price Ranges",
-        "range_interval": "Range Interval",
-        "batch_interval": "Batch Interval",
-        "cycle_delay": "Cycle Delay",
-        "tg_config": "Telegram Configuration",
-        "bot_token": "Bot Token",
-        "chat_id": "Chat ID",
-        "test_alert": "Send Test Alert"
-    },
-    "targets": {
-        "add_item": "Add New Item",
-        "item_name": "Item Name (Exact)",
-        "target_price": "Target Price",
-        "no_items": "No items in target list."
-    },
-    "alerts": {
-        "new_item": "🚨 NEW ITEM FOUND!",
-        "view_link": "View on Withdraw"
-    }
+  "common": {
+    "save": "Save",
+    "saved": "Saved",
+    "cancel": "Cancel",
+    "test": "Test",
+    "delete": "Delete",
+    "edit": "Edit",
+    "settings": "Settings",
+    "targets": "Target List",
+    "dashboard": "Dashboard"
+  },
+  "settings": {
+    "price_ranges": "Price Ranges",
+    "range_interval": "Range Interval",
+    "batch_interval": "Batch Interval",
+    "cycle_delay": "Cycle Delay",
+    "tg_config": "Telegram Configuration",
+    "bot_token": "Bot Token",
+    "chat_id": "Chat ID",
+    "test_alert": "Send Test Alert"
+  },
+  "targets": {
+    "add_item": "Add New Item",
+    "item_name": "Item Name (Exact)",
+    "target_price": "Target Price",
+    "no_items": "No items in target list."
+  },
+  "alerts": {
+    "new_item": "🚨 NEW ITEM FOUND!",
+    "view_link": "View on Withdraw"
+  }
 }

@@ -1,23 +1,27 @@
 {
-    "manifest_version": 3,
-    "name": "CSGORoll Price Tracker Crawler",
-    "version": "1.0.0",
-    "description": "Configuration for the CSGORoll Price Tracker Crawler.",
-    "permissions": [
-        "storage"
-    ],
-    "host_permissions": [
-        "https://api.telegram.org/*",
-        "https://www.csgoroll.com/*",
-        "https://router.csgoroll.com/*",
-        "https://api.csgoroll.com/*"
-    ],
-    "background": {
-        "service_worker": "src/background.ts",
-        "type": "module"
-    },
-    "options_page": "index.html",
-    "action": {
-        "default_title": "CSGORoll Price Tracker Crawler"
-    }
+  "manifest_version": 3,
+  "name": "CSGORoll Price Tracker Crawler",
+  "version": "1.0.0",
+  "description": "Configuration for the CSGORoll Price Tracker Crawler.",
+  "permissions": ["storage"],
+  "host_permissions": [
+    "https://api.telegram.org/*",
+    "https://www.csgoroll.com/*",
+    "https://router.csgoroll.com/*",
+    "https://api.csgoroll.com/*"
+  ],
+  "background": {
+    "service_worker": "src/background.ts",
+    "type": "module"
+  },
+  "options_page": "index.html",
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  },
+  "action": {
+    "default_title": "CSGORoll Price Tracker Crawler",
+    "default_icon": "icon.png"
+  }
 }

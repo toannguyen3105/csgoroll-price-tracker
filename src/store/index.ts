@@ -1,3 +1,3 @@
 // Store exports
-export * from './useAppStore';
-export * from './useConfigStore';
+export * from "./useAppStore";
+export * from "./useConfigStore";

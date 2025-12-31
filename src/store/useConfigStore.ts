@@ -1,139 +1,150 @@
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
-import { chromeStorageWrapper } from '@/utils/chrome-storage-wrapper';
-import i18n from '@/i18n/config';
+import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
+import { chromeStorageWrapper } from "@/utils/chrome-storage-wrapper";
+import i18n from "@/i18n/config";
 
 export interface TargetItem {
-    id: string;
-    name: string;
-    targetPrice: number;
-    isActive: boolean;
+  id: string;
+  name: string;
+  targetPrice: number;
+  isActive: boolean;
 }
 
 export interface Intervals {
-    range: number;
-    batch: number;
-    cycle: number;
+  range: number;
+  batch: number;
+  cycle: number;
 }
 
 export interface TelegramConfig {
-    botToken: string;
-    chatId: string;
+  botToken: string;
+  chatId: string;
 }
 
 export interface LiveItem {
-    id: string;
-    name: string;
-    price: number;
-    markup: number;
-    isMatch: boolean;
-    timestamp: string;
+  id: string;
+  name: string;
+  price: number;
+  markup: number;
+  isMatch: boolean;
+  timestamp: string;
 }
 
-export type Language = 'en' | 'vi';
+export type Language = "en" | "vi";
 
 interface ConfigState {
-    targetList: TargetItem[];
-    intervals: Intervals;
-    telegram: TelegramConfig;
-    isCrawling: boolean;
-    logs: string[];
-    liveResults: LiveItem[];
-    language: Language;
-    _hasHydrated: boolean;
+  targetList: TargetItem[];
+  intervals: Intervals;
+  telegram: TelegramConfig;
+  isCrawling: boolean;
+  logs: string[];
+  liveResults: LiveItem[];
+  language: Language;
+  _hasHydrated: boolean;
 
-    // Actions
-    updateIntervals: (newIntervals: Partial<Intervals>) => void;
-    updateTelegram: (config: Partial<TelegramConfig>) => void;
-    addTargetItem: (item: Omit<TargetItem, 'id'>) => void;
-    deleteTargetItem: (id: string) => void;
-    toggleTargetItem: (id: string) => void;
-    setLogs: (message: string) => void;
-    clearLogs: () => void;
-    setCrawlingStatus: (status: boolean) => void;
-    addLiveResult: (item: LiveItem) => void;
-    clearLiveResults: () => void;
-    setLanguage: (lang: Language) => void;
-    setHasHydrated: (state: boolean) => void;
+  // Actions
+  updateIntervals: (newIntervals: Partial<Intervals>) => void;
+  updateTelegram: (config: Partial<TelegramConfig>) => void;
+  addTargetItem: (item: Omit<TargetItem, "id">) => void;
+  deleteTargetItem: (id: string) => void;
+  toggleTargetItem: (id: string) => void;
+  setLogs: (message: string) => void;
+  clearLogs: () => void;
+  setCrawlingStatus: (status: boolean) => void;
+  addLiveResult: (item: LiveItem) => void;
+  clearLiveResults: () => void;
+  setLanguage: (lang: Language) => void;
+  setHasHydrated: (state: boolean) => void;
 }
 
 export const useConfigStore = create<ConfigState>()(
-    persist(
-        (set) => ({
-            targetList: [],
-            intervals: { range: 10, batch: 10, cycle: 65 }, // Default values
-            telegram: { botToken: '', chatId: '' },
-            isCrawling: false,
-            logs: [],
-            liveResults: [],
-            language: 'en',
-            _hasHydrated: false,
+  persist(
+    (set) => ({
+      targetList: [],
+      intervals: { range: 10, batch: 10, cycle: 65 }, // Default values
+      telegram: { botToken: "", chatId: "" },
+      isCrawling: false,
+      logs: [],
+      liveResults: [],
+      language: "en",
+      _hasHydrated: false,
 
-            updateIntervals: (newIntervals) => set((state) => ({
-                intervals: { ...state.intervals, ...newIntervals }
-            })),
+      updateIntervals: (newIntervals) =>
+        set((state) => ({
+          intervals: { ...state.intervals, ...newIntervals },
+        })),
 
-            updateTelegram: (config) => set((state) => ({
-                telegram: { ...state.telegram, ...config }
-            })),
+      updateTelegram: (config) =>
+        set((state) => ({
+          telegram: { ...state.telegram, ...config },
+        })),
 
-            addTargetItem: (item) => set((state) => {
-                const newItem = { ...item, id: crypto.randomUUID(), isActive: true };
-                return { targetList: [...state.targetList, newItem] };
-            }),
-
-            deleteTargetItem: (id) => set((state) => ({
-                targetList: state.targetList.filter((i) => i.id !== id)
-            })),
-
-            toggleTargetItem: (id) => set((state) => ({
-                targetList: state.targetList.map((i) =>
-                    i.id === id ? { ...i, isActive: !i.isActive } : i
-                )
-            })),
-
-            setLogs: (message) => set((state) => {
-                const newLogs = [message, ...state.logs].slice(0, 100);
-                return { logs: newLogs };
-            }),
-
-            clearLogs: () => set({ logs: [] }),
-
-            setCrawlingStatus: (status) => set({ isCrawling: status }),
-
-            addLiveResult: (item) => set((state) => {
-                const newResults = [item, ...state.liveResults].slice(0, 200);
-                return { liveResults: newResults };
-            }),
-
-            clearLiveResults: () => set({ liveResults: [] }),
-
-            setLanguage: (lang) => {
-                set({ language: lang });
-                i18n.changeLanguage(lang);
-            },
-
-            setHasHydrated: (state) => set({ _hasHydrated: state }),
+      addTargetItem: (item) =>
+        set((state) => {
+          const newItem = { ...item, id: crypto.randomUUID(), isActive: true };
+          return { targetList: [...state.targetList, newItem] };
         }),
-        {
-            name: 'crawler-storage',
-            storage: createJSONStorage(() => chromeStorageWrapper),
-            onRehydrateStorage: () => (state) => {
-                state?.setHasHydrated(true);
-                if (state && state.language) {
-                    i18n.changeLanguage(state.language);
-                }
-            },
+
+      deleteTargetItem: (id) =>
+        set((state) => ({
+          targetList: state.targetList.filter((i) => i.id !== id),
+        })),
+
+      toggleTargetItem: (id) =>
+        set((state) => ({
+          targetList: state.targetList.map((i) =>
+            i.id === id ? { ...i, isActive: !i.isActive } : i,
+          ),
+        })),
+
+      setLogs: (message) =>
+        set((state) => {
+          const newLogs = [message, ...state.logs].slice(0, 100);
+          return { logs: newLogs };
+        }),
+
+      clearLogs: () => set({ logs: [] }),
+
+      setCrawlingStatus: (status) => set({ isCrawling: status }),
+
+      addLiveResult: (item) =>
+        set((state) => {
+          const newResults = [item, ...state.liveResults].slice(0, 200);
+          return { liveResults: newResults };
+        }),
+
+      clearLiveResults: () => set({ liveResults: [] }),
+
+      setLanguage: (lang) => {
+        set({ language: lang });
+        i18n.changeLanguage(lang);
+      },
+
+      setHasHydrated: (state) => set({ _hasHydrated: state }),
+    }),
+    {
+      name: "crawler-storage",
+      storage: createJSONStorage(() => chromeStorageWrapper),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+        if (state && state.language) {
+          i18n.changeLanguage(state.language);
         }
-    )
+      },
+    },
+  ),
 );
 
 // Chrome Storage Sync Listener
-if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.onChanged) {
-    chrome.storage.onChanged.addListener((changes, areaName) => {
-        if (areaName === 'local' && changes['crawler-storage']) {
-            // console.log('[Store] Detected external storage change, syncing...');
-            useConfigStore.persist.rehydrate();
-        }
-    });
+if (
+  typeof chrome !== "undefined" &&
+  chrome.storage &&
+  chrome.storage.onChanged
+) {
+  chrome.storage.onChanged.addListener((changes, areaName) => {
+    if (areaName === "local" && changes["crawler-storage"]) {
+      // console.log('[Store] Detected external storage change, syncing...');
+      useConfigStore.persist.rehydrate();
+    }
+  });
 }

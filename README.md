@@ -1,73 +1,98 @@
-# React + TypeScript + Vite
+# CSGORoll Price Tracker Crawler
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is a Chrome Extension designed to crawl and track item prices on [CSGORoll](https://www.csgoroll.com/). It allows users to set up price ranges and target items, and sends notifications via a Telegram Bot when a matching item is found.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Automated Crawling**: Continuously scrapes the CSGORoll "Withdraw" marketplace for new trades.
+- **Price Range Configuration**: Define specific price ranges (Min/Max) to scan for.
+- **Target Item Watchlist**: Specify item names to watch for.
+- **Telegram Notifications**: Sends real-time alerts to a configured Telegram Chat when a target item is found within the specified price range.
+- **Customizable Intervals**: Adjust scanning intervals and batch delays to manage rate limits.
+- **Dashboard UI**: A user-friendly React-based dashboard to manage settings, view logs, and control the crawler.
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Framework**: [React 19](https://react.dev/)
+- **Build Tool**: [Vite](https://vitejs.dev/) with [@crxjs/vite-plugin](https://crxjs.dev/vite-plugin)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **State Management**: [Zustand](https://zustand-demo.pmnd.rs/)
+- **Data Fetching**: [TanStack Query](https://tanstack.com/query/latest)
+- **Icons**: [Lucide React](https://lucide.dev/)
 
-## Expanding the ESLint configuration
+## Project Structure
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+src/
+├── api/             # API definitions
+├── assets/          # Static assets
+├── components/      # React UI components
+├── constants/       # App constants
+├── crawler/         # Core Crawler Logic
+│   ├── engine.ts       # Main crawling loop
+│   ├── api.ts          # CSGORoll GraphQL API interaction
+│   └── itemMatcher.ts  # Logic to match items against targets
+├── hooks/           # Custom React Hooks
+├── notifier/        # Notification services (Telegram)
+├── store/           # Zustand stores
+├── utils/           # Utility functions
+├── background.ts    # Chrome Extension Service Worker (Entry point for crawler)
+├── content.ts       # Content scripts (if any)
+└── App.tsx          # Main Dashboard UI
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Installation & Development
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Prerequisites
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- Node.js (v18+ recommended)
+- pnpm (or npm/yarn)
+
+### Setup
+
+1.  **Clone the repository**
+2.  **Install dependencies**:
+    ```bash
+    pnpm install
+    ```
+
+### Development Mode
+
+To run in development mode with HMR (Hot Module Replacement):
+
+```bash
+pnpm dev
 ```
+
+This will generate a `dist` folder. You can load this folder as an "Unpacked Extension" in Chrome.
+
+### Building for Production
+
+To build the extension for production:
+
+```bash
+pnpm build
+```
+
+This creates an optimized build in the `dist` directory.
+
+## Loading into Chrome
+
+1.  Open Chrome and navigate to `chrome://extensions/`.
+2.  Enable **Developer mode** in the top-right corner.
+3.  Click **Load unpacked**.
+4.  Select the `dist` directory created by the build command.
+
+## Configuration
+
+Once installed:
+
+1.  Click the extension icon to open the Dashboard.
+2.  **Settings Tab**:
+    - **Telegram Config**: Enter your Bot Token and Chat ID.
+    - **Intervals**: Configure crawl speed (Range Interval, Batch Interval, Cycle Delay).
+    - **Price Ranges**: Add price ranges (Min/Max) you want to scan.
+3.  **Target Items Tab**:
+    - Add item names you are looking for (e.g., "AWP | Asiimov").
+4.  The crawler runs in the background. Check the logs/status in the dashboard.

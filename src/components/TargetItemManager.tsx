@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import type { TargetItem } from "@/types";
+import { useConfigStore } from "@/store/useConfigStore";
 import { Plus, Search } from "lucide-react";
 import { storageHelper } from "@/storage_helper";
 import { TargetListTable } from "./TargetListTable";
@@ -40,6 +41,7 @@ export const TargetItemManager: React.FC<Props> = ({
       ]);
       setNewItemName("");
       setNewItemPrice("");
+      useConfigStore.getState().clearLiveResults();
     }
   };
 
@@ -53,13 +55,15 @@ export const TargetItemManager: React.FC<Props> = ({
       prev.map((item) =>
         item.id === id
           ? { ...item, isActive: !item.isActive, enabled: !item.enabled }
-          : item,
-      ),
+          : item
+      )
     );
+    useConfigStore.getState().clearLiveResults();
   };
 
   const deleteItem = (id: string) => {
     setTargetItems((prev) => prev.filter((item) => item.id !== id));
+    useConfigStore.getState().clearLiveResults();
   };
 
   const editItem = (item: TargetItem) => {
@@ -72,7 +76,7 @@ export const TargetItemManager: React.FC<Props> = ({
   };
 
   const filteredItems = targetItems.filter((item) =>
-    item.name.toLowerCase().includes(searchQuery.toLowerCase()),
+    item.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (

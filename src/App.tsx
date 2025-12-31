@@ -8,8 +8,11 @@ import {
   TargetItemManager,
   LiveDataTableContainer,
 } from "@/components";
+import { Loader2 } from "lucide-react";
+
 import { storageHelper } from "@/storage_helper";
 import { useConfigStore } from "@/store/useConfigStore";
+import { cn } from "@/utils";
 import { useCrawlerListener, useWithdrawQuery } from "@/hooks";
 import type {
   AppState,
@@ -18,12 +21,11 @@ import type {
   TelegramConfig as ITelegramConfig,
   TargetItem,
 } from "@/types";
-import { Loader2 } from "lucide-react";
 import "./i18n/config";
 
 const App = () => {
   const [activeTab, setActiveTab] = useState<"settings" | "targets">(
-    "settings",
+    "settings"
   );
   const [loading, setLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<
@@ -79,6 +81,8 @@ const App = () => {
         targetItems,
       };
       await storageHelper.set(state);
+      // Clear live results when settings change
+      useConfigStore.getState().clearLiveResults();
       setSaveStatus("success");
       setTimeout(() => setSaveStatus("idle"), 2000);
     } catch (error) {
@@ -133,13 +137,17 @@ const App = () => {
             <button
               onClick={handleSaveSettings}
               disabled={saveStatus === "saving"}
-              className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-bold tracking-wide transition-all transform active:scale-[0.98] ${
-                saveStatus === "success"
-                  ? "bg-emerald-600 text-white hover:bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.4)]"
-                  : saveStatus === "error"
-                    ? "bg-rose-600 text-white hover:bg-rose-500 shadow-[0_0_15px_rgba(225,29,72,0.4)]"
-                    : "bg-cyan-600 text-white hover:bg-cyan-500 shadow-[0_0_15px_rgba(8,145,178,0.4)] hover:shadow-[0_0_20px_rgba(8,145,178,0.6)]"
-              }`}
+              className={cn(
+                "w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-bold tracking-wide transition-all transform active:scale-[0.98]",
+                {
+                  "bg-emerald-600 text-white hover:bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.4)]":
+                    saveStatus === "success",
+                  "bg-rose-600 text-white hover:bg-rose-500 shadow-[0_0_15px_rgba(225,29,72,0.4)]":
+                    saveStatus === "error",
+                  "bg-cyan-600 text-white hover:bg-cyan-500 shadow-[0_0_15px_rgba(8,145,178,0.4)] hover:shadow-[0_0_20px_rgba(8,145,178,0.6)]":
+                    saveStatus !== "success" && saveStatus !== "error",
+                }
+              )}
             >
               {saveStatus === "saving" ? (
                 <Loader2 className="animate-spin" size={18} />

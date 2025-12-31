@@ -1,4 +1,5 @@
 import { flexRender } from "@tanstack/react-table";
+import { cn } from "@/utils";
 import type { Row } from "@tanstack/react-table";
 import React from "react";
 
@@ -12,9 +13,12 @@ export const DataTableRow = React.memo(
   <TData,>({ row, isMatch }: TableRowProps<TData>) => {
     return (
       <tr
-        className={`border-b border-slate-800/50 transition-all duration-200 hover:bg-slate-800/50 ${
-          isMatch ? "bg-emerald-900/10 hover:bg-emerald-900/20" : ""
-        }`}
+        className={cn(
+          "border-b border-slate-800/50 transition-all duration-200 hover:bg-slate-800/50",
+          {
+            "bg-emerald-900/10 hover:bg-emerald-900/20": isMatch,
+          }
+        )}
       >
         {row.getVisibleCells().map((cell) => (
           <td key={cell.id} className="p-3 align-middle text-sm text-slate-300">
@@ -24,5 +28,5 @@ export const DataTableRow = React.memo(
       </tr>
     );
   },
-  (prev, next) => prev.row.original === next.row.original, // Only re-render if data changes
+  (prev, next) => prev.row.original === next.row.original // Only re-render if data changes
 );

@@ -1,6 +1,10 @@
+import { CheckCircle, Loader2, Send, XCircle, Play } from "lucide-react";
 import React, { useState } from "react";
-import type { TelegramConfig as ITelegramConfig } from "../types";
-import { Send, CheckCircle, XCircle, Loader2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
+
+import { useTestBotToken, useTestChatId } from "@/hooks";
+import type { TelegramConfig as ITelegramConfig } from "@/types";
+import { cn } from "@/utils";
 
 interface Props {
   config: ITelegramConfig;
@@ -8,104 +12,201 @@ interface Props {
 }
 
 export const TelegramConfig: React.FC<Props> = ({ config, setConfig }) => {
-  const [status, setStatus] = useState<
-    "idle" | "loading" | "success" | "error"
-  >("idle");
-  const [errorMessage, setErrorMessage] = useState<string>("");
+  const { t } = useTranslation();
+
+  // State for Bot Token Test
+  const [botTokenError, setBotTokenError] = useState<string>("");
+  const {
+    mutate: testBotToken,
+    isPending: isBotTokenPending,
+    isSuccess: isBotTokenSuccess,
+    isError: isBotTokenError,
+  } = useTestBotToken();
+
+  // State for Chat ID Test
+  const [chatIdError, setChatIdError] = useState<string>("");
+  const {
+    mutate: testChatId,
+    isPending: isChatIdPending,
+    isSuccess: isChatIdSuccess,
+    isError: isChatIdError,
+  } = useTestChatId();
 
   const handleChange = (field: keyof ITelegramConfig, value: string) => {
     setConfig((prev) => ({ ...prev, [field]: value }));
-    setStatus("idle");
+    // Clear errors when user types
+    if (field === "botToken") {
+      setBotTokenError("");
+    }
+    if (field === "chatId") {
+      setChatIdError("");
+    }
   };
 
-  const testConnection = async () => {
-    if (!config.botToken) {
-      setErrorMessage("Bot Token is required");
-      setStatus("error");
-      return;
-    }
+  const handleTestBotToken = () => {
+    setBotTokenError("");
+    testBotToken(config.botToken, {
+      onError: (error) => {
+        const errorMap: Record<string, string> = {
+          bot_token_required: "settings.bot_token_required",
+          network_error: "settings.network_error",
+          failed_to_connect: "settings.failed_to_connect",
+        };
+        const translationKey = errorMap[error.message];
+        setBotTokenError(translationKey ? t(translationKey) : error.message);
+      },
+    });
+  };
 
-    setStatus("loading");
-    setErrorMessage("");
-
-    try {
-      const response = await fetch(
-        `https://api.telegram.org/bot${config.botToken}/getMe`,
-      );
-      const data = await response.json();
-
-      if (data.ok) {
-        setStatus("success");
-      } else {
-        setStatus("error");
-        setErrorMessage(data.description || "Failed to connect");
+  const handleTestChatId = () => {
+    setChatIdError("");
+    testChatId(
+      { botToken: config.botToken, chatId: config.chatId },
+      {
+        onError: (error) => {
+          const errorMap: Record<string, string> = {
+            bot_token_required: "settings.bot_token_required",
+            chat_id_required: "settings.chat_id_required",
+            network_error: "settings.network_error",
+            failed_to_connect: "settings.failed_to_connect",
+          };
+          const translationKey = errorMap[error.message];
+          setChatIdError(translationKey ? t(translationKey) : error.message);
+        },
       }
-    } catch (error) {
-      setStatus("error");
-      setErrorMessage("Network error or invalid token format");
-    }
+    );
   };
+
+  const isBotTokenValid = isBotTokenSuccess && !botTokenError;
+  const isBotTokenInvalid = isBotTokenError || botTokenError;
+
+  const isChatIdValid = isChatIdSuccess && !chatIdError;
+  const isChatIdInvalid = isChatIdError || chatIdError;
 
   return (
     <div className="p-4 bg-slate-800/50 rounded-lg border border-slate-700/50">
       <div className="flex items-center gap-2 mb-4">
         <Send className="text-cyan-500" size={18} />
         <h2 className="text-sm font-semibold text-slate-100 uppercase tracking-wider">
-          Telegram Integration
+          {t("settings.tg_config")}
         </h2>
       </div>
 
       <div className="space-y-4">
+        {/* Bot Token Input Group */}
         <div>
           <label className="block text-xs font-medium text-slate-400 mb-1 uppercase tracking-wide">
-            Bot Token
+            {t("settings.bot_token")}
           </label>
-          <input
-            type="password"
-            value={config.botToken}
-            onChange={(e) => handleChange("botToken", e.target.value)}
-            placeholder="123456789:ABCdef..."
-            className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-md text-slate-200 text-sm focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 placeholder-slate-600 transition-all font-mono"
-          />
-        </div>
-
-        <div>
-          <label className="block text-xs font-medium text-slate-400 mb-1 uppercase tracking-wide">
-            Chat ID
-          </label>
-          <input
-            type="text"
-            value={config.chatId}
-            onChange={(e) => handleChange("chatId", e.target.value)}
-            placeholder="-100123456789"
-            className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-md text-slate-200 text-sm focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 placeholder-slate-600 transition-all font-mono"
-          />
-        </div>
-
-        <div className="flex items-center gap-4 mt-2">
-          <button
-            onClick={testConnection}
-            disabled={status === "loading"}
-            className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-white bg-cyan-600 rounded-md hover:bg-cyan-500 transition disabled:opacity-50 shadow-[0_0_10px_rgba(8,145,178,0.3)] hover:shadow-[0_0_15px_rgba(8,145,178,0.5)]"
-          >
-            {status === "loading" ? (
-              <Loader2 className="animate-spin" size={16} />
-            ) : (
-              <CheckCircle size={16} />
-            )}
-            TEST CONNECTION
-          </button>
-
-          {status === "success" && (
-            <span className="flex items-center gap-1 text-sm text-emerald-400 font-medium animate-pulse">
-              <CheckCircle size={16} /> Connected as Bot
-            </span>
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1">
+              <input
+                type="password"
+                value={config.botToken}
+                onChange={(e) => handleChange("botToken", e.target.value)}
+                placeholder="123456789:ABCdef..."
+                className={cn(
+                  "w-full px-3 py-2 bg-slate-900 border rounded-md text-slate-200 text-sm focus:outline-none transition-all font-mono",
+                  {
+                    "border-rose-500 focus:border-rose-500": isBotTokenInvalid,
+                    "border-emerald-500 focus:border-emerald-500":
+                      isBotTokenValid,
+                    "border-slate-700 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500":
+                      !isBotTokenInvalid && !isBotTokenValid,
+                  }
+                )}
+              />
+            </div>
+            <button
+              onClick={handleTestBotToken}
+              disabled={isBotTokenPending}
+              className={cn(
+                "flex items-center justify-center w-9 h-9 rounded-md transition disabled:opacity-50",
+                {
+                  "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20":
+                    isBotTokenValid,
+                  "bg-rose-500/10 text-rose-500 hover:bg-rose-500/20":
+                    isBotTokenInvalid,
+                  "bg-cyan-600 text-white hover:bg-cyan-500":
+                    !isBotTokenValid && !isBotTokenInvalid,
+                }
+              )}
+              title={t("settings.test_connection")}
+            >
+              {isBotTokenPending ? (
+                <Loader2 className="animate-spin" size={16} />
+              ) : isBotTokenValid ? (
+                <CheckCircle size={18} />
+              ) : isBotTokenInvalid ? (
+                <XCircle size={18} />
+              ) : (
+                <Play size={16} fill="currentColor" />
+              )}
+            </button>
+          </div>
+          {isBotTokenInvalid && (
+            <p className="text-xs text-rose-500 mt-1">{botTokenError}</p>
           )}
+        </div>
 
-          {status === "error" && (
-            <span className="flex items-center gap-1 text-sm text-rose-500 font-medium">
-              <XCircle size={16} /> {errorMessage}
-            </span>
+        {/* Chat ID Input Group */}
+        <div>
+          <label className="block text-xs font-medium text-slate-400 mb-1 uppercase tracking-wide">
+            {t("settings.chat_id")}
+          </label>
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1">
+              <input
+                type="text"
+                value={config.chatId}
+                onChange={(e) => handleChange("chatId", e.target.value)}
+                placeholder="-100123456789"
+                className={cn(
+                  "w-full px-3 py-2 bg-slate-900 border rounded-md text-slate-200 text-sm focus:outline-none transition-all font-mono",
+                  {
+                    "border-rose-500 focus:border-rose-500": isChatIdInvalid,
+                    "border-emerald-500 focus:border-emerald-500":
+                      isChatIdValid,
+                    "border-slate-700 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500":
+                      !isChatIdInvalid && !isChatIdValid,
+                  }
+                )}
+              />
+            </div>
+            <button
+              onClick={handleTestChatId}
+              disabled={isChatIdPending}
+              className={cn(
+                "flex items-center justify-center w-9 h-9 rounded-md transition disabled:opacity-50",
+                {
+                  "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20":
+                    isChatIdValid,
+                  "bg-rose-500/10 text-rose-500 hover:bg-rose-500/20":
+                    isChatIdInvalid,
+                  "bg-cyan-600 text-white hover:bg-cyan-500":
+                    !isChatIdValid && !isChatIdInvalid,
+                }
+              )}
+              title="Test Chat ID"
+            >
+              {isChatIdPending ? (
+                <Loader2 className="animate-spin" size={16} />
+              ) : isChatIdValid ? (
+                <CheckCircle size={18} />
+              ) : isChatIdInvalid ? (
+                <XCircle size={18} />
+              ) : (
+                <Play size={16} fill="currentColor" />
+              )}
+            </button>
+          </div>
+          {(isChatIdError || chatIdError) && (
+            <p className="text-xs text-rose-500 mt-1">{chatIdError}</p>
+          )}
+          {isChatIdSuccess && !chatIdError && (
+            <p className="text-xs text-emerald-400 mt-1">
+              {t("settings.test_message_sent")}
+            </p>
           )}
         </div>
       </div>

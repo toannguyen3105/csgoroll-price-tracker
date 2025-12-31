@@ -1,5 +1,6 @@
 import { Trash2, Edit2, Play, Pause } from "lucide-react";
 import type { TargetItem } from "@/types";
+import { cn } from "@/utils";
 
 interface TargetListTableProps {
   items: TargetItem[];
@@ -50,7 +51,12 @@ export const TargetListTable = ({
               items.map((item) => (
                 <tr
                   key={item.id}
-                  className={`group hover:bg-slate-800/50 transition-colors ${!item.isActive ? "opacity-50 grayscale" : ""}`}
+                  className={cn(
+                    "group hover:bg-slate-800/50 transition-colors",
+                    {
+                      "opacity-50 grayscale": !item.isActive,
+                    }
+                  )}
                 >
                   <td className="px-4 py-3 font-medium text-slate-200">
                     {item.name}
@@ -62,11 +68,12 @@ export const TargetListTable = ({
                     <div className="flex items-center justify-end gap-1">
                       <button
                         onClick={() => onToggle(item.id)}
-                        className={`p-1.5 rounded transition-all ${
-                          item.isActive
-                            ? "text-emerald-500 hover:bg-emerald-900/20"
-                            : "text-slate-400 hover:bg-slate-800 hover:text-slate-200"
-                        }`}
+                        className={cn("p-1.5 rounded transition-all", {
+                          "text-emerald-500 hover:bg-emerald-900/20":
+                            item.isActive,
+                          "text-slate-400 hover:bg-slate-800 hover:text-slate-200":
+                            !item.isActive,
+                        })}
                         title={item.isActive ? "Pause" : "Resume"}
                       >
                         {item.isActive ? (

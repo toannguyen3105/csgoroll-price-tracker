@@ -1,9 +1,9 @@
-import React from "react";
 import { Globe } from "lucide-react";
-import { useConfigStore } from "@/store/useConfigStore";
-import type { Language } from "@/store/useConfigStore";
 
-export const LanguageSwitcher: React.FC = () => {
+import type { Language } from "@/store/useConfigStore";
+import { useConfigStore } from "@/store/useConfigStore";
+
+export const LanguageSwitcher = () => {
   const { language, setLanguage } = useConfigStore();
 
   const toggleLanguage = () => {

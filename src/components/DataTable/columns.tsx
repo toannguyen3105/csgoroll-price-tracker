@@ -1,5 +1,6 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import type { LiveItem } from "@/store/useConfigStore";
+import { cn } from "@/utils";
 import { ArrowUpDown } from "lucide-react";
 
 export const columns: ColumnDef<LiveItem>[] = [
@@ -67,11 +68,15 @@ export const columns: ColumnDef<LiveItem>[] = [
     header: "MARKUP",
     cell: ({ row }) => (
       <span
-        className={`text-[10px] font-bold px-2 py-0.5 rounded-sm font-mono ${
-          row.getValue<number>("markup") <= 0
-            ? "bg-rose-900/30 text-rose-400 border border-rose-900/50"
-            : "bg-emerald-900/30 text-emerald-400 border border-emerald-900/50"
-        }`}
+        className={cn(
+          "text-[10px] font-bold px-2 py-0.5 rounded-sm font-mono",
+          {
+            "bg-rose-900/30 text-rose-400 border border-rose-900/50":
+              row.getValue<number>("markup") <= 0,
+            "bg-emerald-900/30 text-emerald-400 border border-emerald-900/50":
+              row.getValue<number>("markup") > 0,
+          }
+        )}
       >
         {row.getValue<number>("markup")}%
       </span>

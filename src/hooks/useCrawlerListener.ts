@@ -8,6 +8,7 @@ export const useCrawlerListener = () => {
 
   useEffect(() => {
     const handleMessage = (message: RuntimeMessage) => {
+      console.log("Received message in UI:", message);
       if (message && message.type === "ITEM_SCANNED") {
         // Ensure payload matches LiveItem structure
         const payload = message.payload;

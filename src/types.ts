@@ -23,6 +23,8 @@ export interface TargetItem {
   enabled?: boolean; // legacy support
   price?: number; // legacy support
   createdAt?: number;
+  lastMatchTime?: string;
+  matchCount?: number;
 }
 
 export interface LogItem {

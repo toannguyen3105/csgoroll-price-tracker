@@ -99,7 +99,9 @@ export const useConfigStore = create<ConfigState>()(
 
       addLiveResult: (item) =>
         set((state) => {
-          const newResults = [item, ...state.liveResults].slice(0, 200);
+          // Deduplicate: Remove existing item with same ID first
+          const filtered = state.liveResults.filter((i) => i.id !== item.id);
+          const newResults = [item, ...filtered].slice(0, 200);
           return { liveResults: newResults };
         }),
 

@@ -31,9 +31,6 @@ export const processItemMatch = async (
   telegramConfig: TelegramConfig,
   range: { min: number; max: number },
 ) => {
-  // Deduplication
-  if (processedItems.has(ctx.itemId)) return;
-
   const trackedPrice = ctx.tradeValue;
   // Use unified helper for boolean check
   const isMatch = isItemMatch(ctx.itemName, trackedPrice, targetItems);
@@ -45,8 +42,9 @@ export const processItemMatch = async (
       t.name.trim().toLowerCase() === ctx.itemName.trim().toLowerCase(),
   );
 
-  // Broadcast to UI
+  // Broadcast to UI - Always send to UI for "Live Feed" visibility
   try {
+    console.log("Broadcasting ITEM_SCANNED:", ctx.itemName);
     chrome.runtime.sendMessage(
       {
         type: "ITEM_SCANNED",
@@ -67,8 +65,11 @@ export const processItemMatch = async (
       },
     );
   } catch {
-    // Ignore extension context invalidated errors
+    // Ignore extensions context invalidated errors
   }
+
+  // Deduplication for ALERTS and LOGIC
+  if (processedItems.has(ctx.itemId)) return;
 
   if (isMatch && targetMatch) {
     processedItems.add(ctx.itemId);
@@ -84,6 +85,27 @@ export const processItemMatch = async (
       type: "TARGET",
       targetPrice: targetMatch.targetPrice,
     });
+
+    // Update Target Item Status in Storage
+    try {
+      const { storageHelper } = await import("@/storage_helper");
+      const currentData = await storageHelper.get(["targetItems"]);
+      if (currentData.targetItems) {
+        const updatedTargets = currentData.targetItems.map((t: TargetItem) => {
+          if (t.id === targetMatch.id) {
+            return {
+              ...t,
+              lastMatchTime: new Date().toISOString(),
+              matchCount: (t.matchCount || 0) + 1,
+            };
+          }
+          return t;
+        });
+        await storageHelper.set({ targetItems: updatedTargets });
+      }
+    } catch (err) {
+      console.error("Failed to update target status:", err);
+    }
   } else {
     // General range tracking
     if (trackedPrice >= range.min && trackedPrice <= range.max) {

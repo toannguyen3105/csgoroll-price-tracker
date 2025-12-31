@@ -87,14 +87,33 @@ export class CrawlerEngine {
         const trades = data.data.trades;
         const items = trades.edges || [];
 
+        console.log("Processing items:", items.length);
+        console.log("Processing items:", items);
+
         for (const edge of items) {
           const item = edge.node;
           const tradeValue = item.totalValue;
-          const tradeItems = item.tradeItems || [];
+          
+          // Robust parsing: Handle bundles (tradeItems) or single items (marketName)
+          // The API might return 'tradeItems' OR 'marketName' directly depending on the query/trade type
+          let finalItems: { marketName: string }[] = [];
 
-          for (const tradeItem of tradeItems) {
+          if (item.tradeItems && item.tradeItems.length > 0) {
+             finalItems = item.tradeItems;
+          } else if (item.marketName) {
+             finalItems = [{ marketName: item.marketName }];
+          }
+
+          if (finalItems.length === 0) {
+             console.warn("Item has no tradeItems or marketName:", item.id);
+             continue;
+          }
+
+          for (const tradeItem of finalItems) {
             const itemName = tradeItem.marketName;
             if (!itemName) continue;
+
+            console.log("Processing item match:", itemName, tradeValue);
 
             await processItemMatch(
               {

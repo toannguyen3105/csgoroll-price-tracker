@@ -14,6 +14,7 @@ export interface TradeNode {
   totalValue: number;
   markupPercent: number;
   tradeItems: TradeItem[];
+  marketName?: string;
 }
 
 export interface PageInfo {

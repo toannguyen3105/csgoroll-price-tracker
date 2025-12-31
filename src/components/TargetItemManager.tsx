@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { Plus, Search, Upload, Download } from "lucide-react";
+
 import type { TargetItem } from "@/types";
 import { useConfigStore } from "@/store/useConfigStore";
-import { Plus, Search } from "lucide-react";
 import { storageHelper } from "@/storage_helper";
 import { TargetListTable } from "./TargetListTable";
 
@@ -14,6 +16,7 @@ export const TargetItemManager: React.FC<Props> = ({
   targetItems,
   setTargetItems,
 }) => {
+  const { t } = useTranslation();
   const [newItemName, setNewItemName] = useState("");
   const [newItemPrice, setNewItemPrice] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -79,18 +82,108 @@ export const TargetItemManager: React.FC<Props> = ({
     item.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // CSV Import Logic
+  const handleImportClick = () => {
+    document.getElementById("csv-file-input")?.click();
+  };
+
+  const handleDownloadTemplate = () => {
+    const csvContent =
+      "Item Name,Price\nAK-47 | Redline (Field-Tested),15.50\nAWP | Asiimov (Battle-Scarred),45.00";
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", "target_template.csv");
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target?.result as string;
+      if (!text) return;
+
+      const lines = text.split(/\r?\n/);
+      const newItems: TargetItem[] = [];
+
+      lines.forEach((line) => {
+        const parts = line.split(",");
+        if (parts.length >= 2) {
+          const name = parts[0].trim();
+          const priceString = parts[1].trim();
+          const price = parseFloat(priceString);
+
+          if (name && !isNaN(price) && price > 0) {
+            newItems.push({
+              id: crypto.randomUUID(),
+              name: name,
+              targetPrice: price,
+              price: price, // Compatibility
+              enabled: true,
+              isActive: true,
+              createdAt: Date.now(),
+            });
+          }
+        }
+      });
+
+      if (newItems.length > 0) {
+        setTargetItems((prev) => [...newItems, ...prev]); // Prepend new items
+        useConfigStore.getState().clearLiveResults();
+        // Reset input value to allow re-importing same file
+        e.target.value = "";
+      }
+    };
+    reader.readAsText(file);
+  };
+
   return (
     <div className="h-full flex flex-col space-y-4">
       {/* Add Form */}
       <div className="bg-slate-800/50 p-4 rounded-lg border border-slate-700/50 shrink-0">
-        <h3 className="text-sm font-semibold text-slate-100 mb-3 flex items-center gap-2 uppercase tracking-wider">
-          <Plus size={16} className="text-cyan-500" /> Add New Target
-        </h3>
+        <div className="flex justify-between items-center mb-3">
+          <h3 className="text-sm font-semibold text-slate-100 flex items-center gap-2 uppercase tracking-wider">
+            <Plus size={16} className="text-cyan-500" />{" "}
+            {t("targets.add_new_target")}
+          </h3>
+
+          {/* CSV Import UI */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleDownloadTemplate}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold text-cyan-400 bg-cyan-950/30 hover:bg-cyan-900/50 border border-cyan-900/50 rounded-md transition-colors uppercase tracking-wide"
+              title={t("targets.download_template_title")}
+            >
+              <Download size={14} /> {t("targets.template_button")}
+            </button>
+            <input
+              type="file"
+              id="csv-file-input"
+              accept=".csv"
+              className="hidden"
+              onChange={handleFileChange}
+            />
+            <button
+              onClick={handleImportClick}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold text-slate-300 bg-slate-700 hover:bg-slate-600 rounded-md transition-colors uppercase tracking-wide"
+              title={t("targets.import_csv_title")}
+            >
+              <Upload size={14} /> {t("targets.import_csv_button")}
+            </button>
+          </div>
+        </div>
         <form onSubmit={handleAdd} className="flex gap-3">
           <div className="flex-1">
             <input
               type="text"
-              placeholder="Item Name (e.g. AWP | Asiimov)"
+              placeholder={t("targets.item_name_placeholder")}
               value={newItemName}
               onChange={(e) => setNewItemName(e.target.value)}
               className="w-full px-3 py-2 text-sm bg-slate-900 border border-slate-700 rounded-md text-slate-200 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 placeholder-slate-600 transition-all"
@@ -99,7 +192,7 @@ export const TargetItemManager: React.FC<Props> = ({
           <div className="w-24">
             <input
               type="number"
-              placeholder="Max $"
+              placeholder={t("targets.max_price_placeholder")}
               value={newItemPrice}
               onChange={(e) => setNewItemPrice(e.target.value)}
               step="0.01"
@@ -111,7 +204,7 @@ export const TargetItemManager: React.FC<Props> = ({
             disabled={!newItemName || !newItemPrice}
             className="px-4 py-2 bg-cyan-600 text-white rounded-md text-sm font-bold uppercase tracking-wider hover:bg-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-[0_0_10px_rgba(8,145,178,0.3)] hover:shadow-[0_0_15px_rgba(8,145,178,0.5)]"
           >
-            Add
+            {t("targets.add_button")}
           </button>
         </form>
       </div>
@@ -126,7 +219,7 @@ export const TargetItemManager: React.FC<Props> = ({
             />
             <input
               type="text"
-              placeholder="Search targets..."
+              placeholder={t("targets.search_placeholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-9 pr-8 py-2 text-sm bg-slate-900 border border-slate-700 rounded-md text-slate-200 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 placeholder-slate-600 transition-all"

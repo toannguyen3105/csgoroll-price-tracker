@@ -41,7 +41,16 @@
     "add_item": "Add New Item",
     "item_name": "Item Name (Exact)",
     "target_price": "Target Price",
-    "no_items": "No items in target list."
+    "no_items": "No items in target list.",
+    "add_new_target": "Add New Target",
+    "item_name_placeholder": "Item Name (e.g. AWP | Asiimov)",
+    "max_price_placeholder": "Max $",
+    "add_button": "Add",
+    "search_placeholder": "Search targets...",
+    "import_csv_title": "Import targets from CSV (Format: Name, Price)",
+    "download_template_title": "Download CSV Template",
+    "template_button": "Template",
+    "import_csv_button": "Import CSV"
   },
   "alerts": {
     "new_item": "🚨 NEW ITEM FOUND!",

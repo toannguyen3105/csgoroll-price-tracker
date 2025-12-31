@@ -1,27 +1,27 @@
+import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
+
 import {
   AppHeader,
   AppTabs,
-  PriceRangeManager,
   IntervalSettings,
-  TelegramConfig,
-  TargetItemManager,
   LiveDataTableContainer,
+  PriceRangeManager,
+  TargetItemManager,
+  TelegramConfig,
 } from "@/components";
-import { Loader2 } from "lucide-react";
-
-import { storageHelper } from "@/storage_helper";
-import { useConfigStore } from "@/store/useConfigStore";
-import { cn } from "@/utils";
 import { useCrawlerListener, useWithdrawQuery } from "@/hooks";
+import "@/i18n";
+import { storageHelper } from "@/storage_helper";
+import { useConfigStore } from "@/store";
 import type {
   AppState,
-  PriceRange,
   Intervals,
   TelegramConfig as ITelegramConfig,
+  PriceRange,
   TargetItem,
 } from "@/types";
-import "./i18n/config";
+import { cn } from "@/utils";
 
 const App = () => {
   const [activeTab, setActiveTab] = useState<"settings" | "targets">(

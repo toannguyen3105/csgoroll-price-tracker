@@ -41,7 +41,16 @@
     "add_item": "Thêm vật phẩm mới",
     "item_name": "Tên vật phẩm (Chính xác)",
     "target_price": "Giá mục tiêu",
-    "no_items": "Chưa có vật phẩm nào trong danh sách."
+    "no_items": "Chưa có vật phẩm nào trong danh sách.",
+    "add_new_target": "Thêm vật phẩm mới",
+    "item_name_placeholder": "Tên vật phẩm (VD: AWP | Asiimov)",
+    "max_price_placeholder": "Giá tối đa $",
+    "add_button": "Thêm",
+    "search_placeholder": "Tìm kiếm...",
+    "import_csv_title": "Nhập từ CSV (Định dạng: Tên, Giá)",
+    "download_template_title": "Tải mẫu CSV",
+    "template_button": "Mẫu",
+    "import_csv_button": "Nhập CSV"
   },
   "alerts": {
     "new_item": "🚨 TÌM THẤY ITEM MỚI!",

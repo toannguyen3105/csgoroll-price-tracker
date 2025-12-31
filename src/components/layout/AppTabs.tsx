@@ -1,10 +1,11 @@
 import { useTranslation } from "react-i18next";
-import { Settings, List } from "lucide-react";
+import { Settings, Activity } from "lucide-react";
 import { cn } from "@/utils";
+import type { AppTab } from "@/types";
 
 interface AppTabsProps {
-  activeTab: "settings" | "targets";
-  setActiveTab: (tab: "settings" | "targets") => void;
+  activeTab: AppTab;
+  setActiveTab: (tab: AppTab) => void;
 }
 
 export const AppTabs = ({ activeTab, setActiveTab }: AppTabsProps) => {
@@ -25,15 +26,15 @@ export const AppTabs = ({ activeTab, setActiveTab }: AppTabsProps) => {
           <Settings size={16} /> {t("common.settings")}
         </button>
         <button
-          onClick={() => setActiveTab("targets")}
+          onClick={() => setActiveTab("monitor")}
           className={cn(
             "flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-semibold transition-all duration-200 uppercase tracking-wide",
-            activeTab === "targets"
-              ? "bg-slate-700 text-cyan-400 shadow-sm"
+            activeTab === "monitor"
+              ? "bg-slate-700 text-emerald-400 shadow-sm"
               : "text-slate-400 hover:text-slate-200 hover:bg-slate-700/50"
           )}
         >
-          <List size={16} /> {t("common.targets")}
+          <Activity size={16} /> {t("common.live_feed")}
         </button>
       </div>
     </div>

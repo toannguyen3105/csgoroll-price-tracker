@@ -40,3 +40,16 @@ export interface AppState {
   telegramConfig: TelegramConfig;
   targetItems: TargetItem[];
 }
+
+export type AppTab = "settings" | "monitor";
+
+export type SaveStatus = "idle" | "saving" | "success" | "error";
+
+export interface LogEntry {
+  id: string;
+  level: "info" | "success" | "warning" | "error";
+  message: string;
+  timestamp: string;
+}
+
+export type Language = "en" | "vi";

@@ -2,6 +2,7 @@
   "common": {
     "save": "Lưu",
     "saved": "Đã lưu",
+    "save_settings": "LƯU CÀI ĐẶT",
     "cancel": "Hủy",
     "test": "Kiểm tra",
     "delete": "Xóa",
@@ -10,7 +11,10 @@
     "targets": "Danh sách theo dõi",
     "dashboard": "Bảng điều khiển",
     "header_title": "CẤU HÌNH CRAWLER",
-    "system_active": "Hệ thống hoạt động"
+    "system_active": "Hệ thống hoạt động",
+    "live_feed": "Hoạt động",
+    "pause": "Tạm dừng",
+    "resume": "Tiếp tục"
   },
   "settings": {
     "price_ranges": "Khoảng giá",
@@ -50,7 +54,16 @@
     "import_csv_title": "Nhập từ CSV (Định dạng: Tên, Giá)",
     "download_template_title": "Tải mẫu CSV",
     "template_button": "Mẫu",
-    "import_csv_button": "Nhập CSV"
+    "import_csv_button": "Nhập CSV",
+    "active_targets": "Đang theo dõi",
+    "actions": "Hành động",
+    "no_targets_set": "Chưa có vật phẩm nào. Hãy thêm ở trên.",
+    "max_price_header": "Giá tối đa",
+    "current_price_header": "Giá hiện tại",
+    "status_header": "Trạng thái",
+    "status_watching": "Đang theo dõi",
+    "status_paused": "Tạm dừng",
+    "status_matched": "Đã khớp"
   },
   "alerts": {
     "new_item": "🚨 TÌM THẤY ITEM MỚI!",

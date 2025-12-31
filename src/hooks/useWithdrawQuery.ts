@@ -9,7 +9,7 @@ export const useWithdrawQuery = () => {
   const intervals = useConfigStore((state) => state.intervals);
   const addLiveResult = useConfigStore((state) => state.addLiveResult);
   const setLogs = useConfigStore((state) => state.setLogs);
-  const targetList = useConfigStore((state) => state.targetList);
+  const targetItems = useConfigStore((state) => state.targetItems);
 
   // Keep track of processed item IDs to avoid duplicates/re-processing
   const processedIds = useRef<Set<string>>(new Set());
@@ -22,7 +22,7 @@ export const useWithdrawQuery = () => {
       return fetchWithdrawItems({ minPrice: 0.5, maxPrice: 2000, signal });
     },
     enabled: isCrawling,
-    refetchInterval: isCrawling ? intervals.batch * 1000 : false,
+    refetchInterval: isCrawling ? intervals.batchInterval * 1000 : false,
     retry: 3,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
     staleTime: 0, // Data is immediately stale
@@ -51,7 +51,7 @@ export const useWithdrawQuery = () => {
           const markup = node.markup;
 
           // Check against Target List
-          const isMatch = targetList.some(
+          const isMatch = targetItems.some(
             (target) =>
               target.isActive &&
               node.marketName
@@ -86,7 +86,7 @@ export const useWithdrawQuery = () => {
         // setLogs(`Crawled ${newCount} new items.`);
       }
     }
-  }, [data, addLiveResult, targetList, setLogs]);
+  }, [data, addLiveResult, targetItems, setLogs]);
 
   // Error Logging
   useEffect(() => {

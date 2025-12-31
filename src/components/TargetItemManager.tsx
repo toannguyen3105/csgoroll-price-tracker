@@ -34,8 +34,8 @@ export const TargetItemManager: React.FC<Props> = ({
         {
           id: crypto.randomUUID(),
           name: newItemName,
-          targetPrice: price, // Mapped to targetPrice in internal type but using price in old logic
-          price: price, // Keeping price for compatibility if needed
+          targetPrice: price,
+          price: price,
           enabled: true,
           isActive: true,
           createdAt: Date.now(),
@@ -47,11 +47,6 @@ export const TargetItemManager: React.FC<Props> = ({
       useConfigStore.getState().clearLiveResults();
     }
   };
-
-  // CSV/JSON Import Helpers (omitted for brevity in this split, kept in main logic if critical or moved to utils)
-  // For this refactor, I'm keeping them but condensing logic.
-
-  // ... (Import logic assumed handled or simplified)
 
   const toggleItem = (id: string) => {
     setTargetItems((prev) =>
@@ -70,11 +65,8 @@ export const TargetItemManager: React.FC<Props> = ({
   };
 
   const editItem = (item: TargetItem) => {
-    // Logic for editing inline or popping to form
     setNewItemName(item.name);
     setNewItemPrice(item.targetPrice.toString());
-    // For simple UX, populate add form and remove old on save, or complex inline edit
-    // Using delete-then-add pattern for simplicity in this manager refactor
     deleteItem(item.id);
   };
 
@@ -88,8 +80,9 @@ export const TargetItemManager: React.FC<Props> = ({
   };
 
   const handleDownloadTemplate = () => {
+    // Add \uFEFF check for Excel UTF-8 compatibility
     const csvContent =
-      "Item Name,Price\nAK-47 | Redline (Field-Tested),15.50\nAWP | Asiimov (Battle-Scarred),45.00";
+      "\uFEFFItem Name,Price\nAK-47 | Redline (Field-Tested),15.50\nAWP | Asiimov (Battle-Scarred),45.00\n★ Specialist Gloves | Emerald Web (Battle-Scarred),2000.20";
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
@@ -125,7 +118,7 @@ export const TargetItemManager: React.FC<Props> = ({
               id: crypto.randomUUID(),
               name: name,
               targetPrice: price,
-              price: price, // Compatibility
+              price: price,
               enabled: true,
               isActive: true,
               createdAt: Date.now(),
@@ -145,23 +138,79 @@ export const TargetItemManager: React.FC<Props> = ({
   };
 
   return (
-    <div className="h-full flex flex-col space-y-4">
-      {/* Add Form */}
-      <div className="bg-slate-800/50 p-4 rounded-lg border border-slate-700/50 shrink-0">
-        <div className="flex justify-between items-center mb-3">
-          <h3 className="text-sm font-semibold text-slate-100 flex items-center gap-2 uppercase tracking-wider">
-            <Plus size={16} className="text-cyan-500" />{" "}
+    <div className="h-full flex flex-col gap-4 p-4 lg:p-6 overflow-hidden">
+      {/* Creation Card */}
+      <div className="bg-slate-900/60 backdrop-blur-md border border-white/5 rounded-xl p-5 shadow-xl shrink-0 max-w-4xl mx-auto w-full">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="p-2 bg-cyan-500/10 rounded-lg">
+            <Plus size={20} className="text-cyan-400" />
+          </div>
+          <h3 className="text-base font-bold text-slate-100 uppercase tracking-wider">
             {t("targets.add_new_target")}
           </h3>
+        </div>
 
-          {/* CSV Import UI */}
+        <form onSubmit={handleAdd} className="flex gap-4">
+          <div className="flex-1 relative group">
+            <input
+              type="text"
+              placeholder={t("targets.item_name_placeholder")}
+              value={newItemName}
+              onChange={(e) => setNewItemName(e.target.value)}
+              className="w-full px-4 py-3 bg-slate-950/50 border border-slate-700/50 rounded-lg text-slate-200 focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 placeholder-slate-600 transition-all"
+            />
+            <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-cyan-500/0 via-cyan-500/0 to-cyan-500/5 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity" />
+          </div>
+          <div className="w-32 relative">
+            <input
+              type="number"
+              placeholder={t("targets.max_price_placeholder")}
+              value={newItemPrice}
+              onChange={(e) => setNewItemPrice(e.target.value)}
+              step="0.01"
+              className="w-full px-4 py-3 bg-slate-950/50 border border-slate-700/50 rounded-lg text-slate-200 focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 placeholder-slate-600 transition-all font-mono"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={!newItemName || !newItemPrice}
+            className="px-8 py-3 bg-cyan-600 text-white rounded-lg text-sm font-bold uppercase tracking-wider hover:bg-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-cyan-900/20 hover:shadow-cyan-500/20 hover:translate-y-[-1px] active:translate-y-[0px]"
+          >
+            {t("targets.add_button")}
+          </button>
+        </form>
+      </div>
+
+      {/* Data Panel */}
+      <div className="flex-1 flex flex-col min-h-0 bg-slate-900/60 backdrop-blur-md border border-white/5 rounded-xl shadow-xl overflow-hidden max-w-4xl mx-auto w-full">
+        {/* Toolbar */}
+        <div className="p-4 border-b border-white/5 flex items-center justify-between gap-4 bg-slate-900/30">
+          <div className="relative flex-1 max-w-md">
+            <Search
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
+              size={16}
+            />
+            <input
+              type="text"
+              placeholder={t("targets.search_placeholder")}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 text-sm bg-slate-950/50 border border-slate-700/50 rounded-lg text-slate-200 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20 placeholder-slate-600 transition-all"
+            />
+          </div>
+
           <div className="flex items-center gap-2">
+            <div className="h-6 w-px bg-slate-700/50 mx-2" />
             <button
               onClick={handleDownloadTemplate}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold text-cyan-400 bg-cyan-950/30 hover:bg-cyan-900/50 border border-cyan-900/50 rounded-md transition-colors uppercase tracking-wide"
+              className="flex items-center gap-2 px-3 py-2 text-xs font-bold text-cyan-400 bg-cyan-950/20 hover:bg-cyan-900/40 border border-cyan-900/30 rounded-lg transition-colors uppercase tracking-wide group"
               title={t("targets.download_template_title")}
             >
-              <Download size={14} /> {t("targets.template_button")}
+              <Download
+                size={14}
+                className="group-hover:scale-110 transition-transform"
+              />
+              <span>{t("targets.template_button")}</span>
             </button>
             <input
               type="file"
@@ -172,62 +221,20 @@ export const TargetItemManager: React.FC<Props> = ({
             />
             <button
               onClick={handleImportClick}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold text-slate-300 bg-slate-700 hover:bg-slate-600 rounded-md transition-colors uppercase tracking-wide"
+              className="flex items-center gap-2 px-3 py-2 text-xs font-bold text-emerald-400 bg-emerald-950/20 hover:bg-emerald-900/40 border border-emerald-900/30 rounded-lg transition-colors uppercase tracking-wide group"
               title={t("targets.import_csv_title")}
             >
-              <Upload size={14} /> {t("targets.import_csv_button")}
+              <Upload
+                size={14}
+                className="group-hover:scale-110 transition-transform"
+              />
+              <span>{t("targets.import_csv_button")}</span>
             </button>
           </div>
         </div>
-        <form onSubmit={handleAdd} className="flex gap-3">
-          <div className="flex-1">
-            <input
-              type="text"
-              placeholder={t("targets.item_name_placeholder")}
-              value={newItemName}
-              onChange={(e) => setNewItemName(e.target.value)}
-              className="w-full px-3 py-2 text-sm bg-slate-900 border border-slate-700 rounded-md text-slate-200 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 placeholder-slate-600 transition-all"
-            />
-          </div>
-          <div className="w-24">
-            <input
-              type="number"
-              placeholder={t("targets.max_price_placeholder")}
-              value={newItemPrice}
-              onChange={(e) => setNewItemPrice(e.target.value)}
-              step="0.01"
-              className="w-full px-3 py-2 text-sm bg-slate-900 border border-slate-700 rounded-md text-slate-200 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 placeholder-slate-600 transition-all font-mono"
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={!newItemName || !newItemPrice}
-            className="px-4 py-2 bg-cyan-600 text-white rounded-md text-sm font-bold uppercase tracking-wider hover:bg-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-[0_0_10px_rgba(8,145,178,0.3)] hover:shadow-[0_0_15px_rgba(8,145,178,0.5)]"
-          >
-            {t("targets.add_button")}
-          </button>
-        </form>
-      </div>
 
-      {/* List & Search */}
-      <div className="flex-1 flex flex-col min-h-0 bg-slate-950 border border-slate-800 rounded-lg overflow-hidden">
-        <div className="p-3 border-b border-slate-800 bg-slate-900/50">
-          <div className="relative">
-            <Search
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
-              size={14}
-            />
-            <input
-              type="text"
-              placeholder={t("targets.search_placeholder")}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-8 py-2 text-sm bg-slate-900 border border-slate-700 rounded-md text-slate-200 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 placeholder-slate-600 transition-all"
-            />
-          </div>
-        </div>
-
-        <div className="flex-1 overflow-hidden bg-slate-950">
+        {/* Table Content */}
+        <div className="flex-1 overflow-hidden">
           <TargetListTable
             items={filteredItems}
             onToggle={toggleItem}

@@ -1,5 +1,6 @@
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import {
   AppHeader,
@@ -20,17 +21,16 @@ import type {
   TelegramConfig as ITelegramConfig,
   PriceRange,
   TargetItem,
+  AppTab,
+  SaveStatus,
 } from "@/types";
 import { cn } from "@/utils";
 
 const App = () => {
-  const [activeTab, setActiveTab] = useState<"settings" | "targets">(
-    "settings"
-  );
+  const { t } = useTranslation();
+  const [activeTab, setActiveTab] = useState<AppTab>("settings");
   const [loading, setLoading] = useState(true);
-  const [saveStatus, setSaveStatus] = useState<
-    "idle" | "saving" | "success" | "error"
-  >("idle");
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
 
   const _hasHydrated = useConfigStore((state) => state._hasHydrated);
 
@@ -124,10 +124,7 @@ const App = () => {
             </div>
           ) : (
             <div className="h-full">
-              <TargetItemManager
-                targetItems={targetItems}
-                setTargetItems={setTargetItems}
-              />
+              <LiveDataTableContainer />
             </div>
           )}
         </main>
@@ -152,19 +149,22 @@ const App = () => {
               {saveStatus === "saving" ? (
                 <Loader2 className="animate-spin" size={18} />
               ) : saveStatus === "success" ? (
-                <span>SAVED</span>
+                <span>{t("common.saved")}</span>
               ) : (
-                "SAVE SETTINGS"
+                t("common.save_settings")
               )}
             </button>
           </footer>
         )}
       </aside>
 
-      {/* Main Content Area (Live Feed) */}
+      {/* Main Content Area (Target Manager) */}
       <div className="flex-1 h-full bg-slate-950 overflow-hidden relative">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-cyan-900/10 via-slate-950 to-slate-950 pointer-events-none" />
-        <LiveDataTableContainer />
+        <TargetItemManager
+          targetItems={targetItems}
+          setTargetItems={setTargetItems}
+        />
       </div>
     </div>
   );

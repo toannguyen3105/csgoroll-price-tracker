@@ -1,6 +1,6 @@
 import { Globe } from "lucide-react";
 
-import type { Language } from "@/store/useConfigStore";
+import type { Language } from "@/types";
 import { useConfigStore } from "@/store/useConfigStore";
 
 export const LanguageSwitcher = () => {

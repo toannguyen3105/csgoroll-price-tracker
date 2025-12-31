@@ -2,24 +2,13 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { chromeStorageWrapper } from "@/utils/chrome-storage-wrapper";
 import i18n from "@/i18n/config";
-
-export interface TargetItem {
-  id: string;
-  name: string;
-  targetPrice: number;
-  isActive: boolean;
-}
-
-export interface Intervals {
-  range: number;
-  batch: number;
-  cycle: number;
-}
-
-export interface TelegramConfig {
-  botToken: string;
-  chatId: string;
-}
+import type {
+  TargetItem,
+  Intervals,
+  TelegramConfig,
+  LogEntry,
+  Language,
+} from "@/types";
 
 export interface LiveItem {
   id: string;
@@ -30,14 +19,12 @@ export interface LiveItem {
   timestamp: string;
 }
 
-export type Language = "en" | "vi";
-
 interface ConfigState {
-  targetList: TargetItem[];
+  targetItems: TargetItem[];
   intervals: Intervals;
   telegram: TelegramConfig;
   isCrawling: boolean;
-  logs: string[];
+  logs: LogEntry[];
   liveResults: LiveItem[];
   language: Language;
   _hasHydrated: boolean;
@@ -48,7 +35,10 @@ interface ConfigState {
   addTargetItem: (item: Omit<TargetItem, "id">) => void;
   deleteTargetItem: (id: string) => void;
   toggleTargetItem: (id: string) => void;
-  setLogs: (message: string) => void;
+  setLogs: (
+    message: string,
+    level?: "info" | "success" | "warning" | "error"
+  ) => void;
   clearLogs: () => void;
   setCrawlingStatus: (status: boolean) => void;
   addLiveResult: (item: LiveItem) => void;
@@ -60,8 +50,8 @@ interface ConfigState {
 export const useConfigStore = create<ConfigState>()(
   persist(
     (set) => ({
-      targetList: [],
-      intervals: { range: 10, batch: 10, cycle: 65 }, // Default values
+      targetItems: [],
+      intervals: { rangeInterval: 10, batchInterval: 10, cycleDelay: 65 }, // Default values
       telegram: { botToken: "", chatId: "" },
       isCrawling: false,
       logs: [],
@@ -82,24 +72,30 @@ export const useConfigStore = create<ConfigState>()(
       addTargetItem: (item) =>
         set((state) => {
           const newItem = { ...item, id: crypto.randomUUID(), isActive: true };
-          return { targetList: [...state.targetList, newItem] };
+          return { targetItems: [...state.targetItems, newItem] };
         }),
 
       deleteTargetItem: (id) =>
         set((state) => ({
-          targetList: state.targetList.filter((i) => i.id !== id),
+          targetItems: state.targetItems.filter((i) => i.id !== id),
         })),
 
       toggleTargetItem: (id) =>
         set((state) => ({
-          targetList: state.targetList.map((i) =>
-            i.id === id ? { ...i, isActive: !i.isActive } : i,
+          targetItems: state.targetItems.map((i) =>
+            i.id === id ? { ...i, isActive: !i.isActive } : i
           ),
         })),
 
-      setLogs: (message) =>
+      setLogs: (message, level = "info") =>
         set((state) => {
-          const newLogs = [message, ...state.logs].slice(0, 100);
+          const newLog: LogEntry = {
+            id: crypto.randomUUID(),
+            level,
+            message,
+            timestamp: new Date().toISOString(),
+          };
+          const newLogs = [newLog, ...state.logs].slice(0, 100);
           return { logs: newLogs };
         }),
 
@@ -131,8 +127,8 @@ export const useConfigStore = create<ConfigState>()(
           i18n.changeLanguage(state.language);
         }
       },
-    },
-  ),
+    }
+  )
 );
 
 // Chrome Storage Sync Listener
@@ -143,7 +139,6 @@ if (
 ) {
   chrome.storage.onChanged.addListener((changes, areaName) => {
     if (areaName === "local" && changes["crawler-storage"]) {
-      // console.log('[Store] Detected external storage change, syncing...');
       useConfigStore.persist.rehydrate();
     }
   });

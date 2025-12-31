@@ -2,6 +2,7 @@
   "common": {
     "save": "Save",
     "saved": "Saved",
+    "save_settings": "SAVE SETTINGS",
     "cancel": "Cancel",
     "test": "Test",
     "delete": "Delete",
@@ -10,7 +11,10 @@
     "targets": "Target List",
     "dashboard": "Dashboard",
     "header_title": "CRAWLER CONFIG",
-    "system_active": "System Active"
+    "system_active": "System Active",
+    "live_feed": "Live Feed",
+    "pause": "Pause",
+    "resume": "Resume"
   },
   "settings": {
     "price_ranges": "Price Ranges",
@@ -50,7 +54,16 @@
     "import_csv_title": "Import targets from CSV (Format: Name, Price)",
     "download_template_title": "Download CSV Template",
     "template_button": "Template",
-    "import_csv_button": "Import CSV"
+    "import_csv_button": "Import CSV",
+    "active_targets": "Active Targets",
+    "actions": "Actions",
+    "no_targets_set": "No targets set. Add one above.",
+    "max_price_header": "Max Price",
+    "current_price_header": "Current Price",
+    "status_header": "Status",
+    "status_watching": "Watching",
+    "status_paused": "Paused",
+    "status_matched": "Matched"
   },
   "alerts": {
     "new_item": "🚨 NEW ITEM FOUND!",

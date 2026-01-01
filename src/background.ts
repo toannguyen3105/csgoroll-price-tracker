@@ -1,5 +1,5 @@
 import { crawler } from "@/crawler";
-import { CRAWLER_COMMANDS } from "@/constants";
+
 
 console.log("Background Service Worker Loaded");
 
@@ -13,18 +13,7 @@ chrome.runtime.onInstalled.addListener(() => {
   crawler.start();
 });
 
-chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-  if (message.command === CRAWLER_COMMANDS.START) {
-    console.log("Starting crawler...");
-    crawler.start();
-    sendResponse({ status: "started" });
-  } else if (message.command === CRAWLER_COMMANDS.STOP) {
-    console.log("Stopping crawler...");
-    crawler.stop();
-    sendResponse({ status: "stopped" });
-  }
-  return true;
-});
+
 
 chrome.action.onClicked.addListener(async () => {
   const url = chrome.runtime.getURL("index.html");

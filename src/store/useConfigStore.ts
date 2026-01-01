@@ -17,7 +17,7 @@ interface ConfigState {
   targetItems: TargetItem[];
   intervals: Intervals;
   telegram: TelegramConfig;
-  isCrawling: boolean;
+
   logs: LogEntry[];
   liveResults: LiveItem[];
   language: Language;
@@ -34,7 +34,7 @@ interface ConfigState {
     level?: "info" | "success" | "warning" | "error"
   ) => void;
   clearLogs: () => void;
-  setCrawlingStatus: (status: boolean) => void;
+
   addLiveResult: (item: LiveItem) => void;
   clearLiveResults: () => void;
   setLanguage: (lang: Language) => void;
@@ -47,7 +47,7 @@ export const useConfigStore = create<ConfigState>()(
       targetItems: [],
       intervals: { rangeInterval: 10, batchInterval: 10, cycleDelay: 65 }, // Default values
       telegram: { botToken: "", chatId: "" },
-      isCrawling: false,
+
       logs: [],
       liveResults: [],
       language: "en",
@@ -95,7 +95,7 @@ export const useConfigStore = create<ConfigState>()(
 
       clearLogs: () => set({ logs: [] }),
 
-      setCrawlingStatus: (status) => set({ isCrawling: status }),
+
 
       addLiveResult: (item) =>
         set((state) => {

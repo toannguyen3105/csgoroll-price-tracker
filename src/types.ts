@@ -43,7 +43,7 @@ export interface AppState {
   targetItems: TargetItem[];
 }
 
-export type AppTab = "settings" | "monitor";
+export type AppTab = "settings" | "monitor" | "targets";
 
 export type SaveStatus = "idle" | "saving" | "success" | "error";
 

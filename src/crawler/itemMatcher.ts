@@ -1,5 +1,5 @@
-import type { TargetItem, TelegramConfig } from "@/types";
-import { sendTelegramAlert } from "@/notifier/telegram";
+import type { TargetItem } from "@/types";
+import type { BatchAlertItem } from "@/notifier/telegram";
 
 export interface MatchContext {
   tradeValue: number;
@@ -28,9 +28,8 @@ export const processItemMatch = async (
   ctx: MatchContext,
   targetItems: TargetItem[],
   processedItems: Set<string>,
-  telegramConfig: TelegramConfig,
   range: { min: number; max: number },
-) => {
+): Promise<BatchAlertItem | null> => {
   const trackedPrice = ctx.tradeValue;
   // Use unified helper for boolean check
   const isMatch = isItemMatch(ctx.itemName, trackedPrice, targetItems);
@@ -69,22 +68,10 @@ export const processItemMatch = async (
   }
 
   // Deduplication for ALERTS and LOGIC
-  if (processedItems.has(ctx.itemId)) return;
+  if (processedItems.has(ctx.itemId)) return null;
 
   if (isMatch && targetMatch) {
     processedItems.add(ctx.itemId);
-
-    const alertItem = {
-      id: ctx.itemId,
-      price: trackedPrice,
-      markup: ctx.markup,
-      assets: [{ name: ctx.itemName }],
-    };
-
-    await sendTelegramAlert(alertItem, telegramConfig, {
-      type: "TARGET",
-      targetPrice: targetMatch.targetPrice,
-    });
 
     // Update Target Item Status in Storage
     try {
@@ -106,10 +93,23 @@ export const processItemMatch = async (
     } catch (err) {
       console.error("Failed to update target status:", err);
     }
+    
+    // Return match details for batching
+    return {
+        id: ctx.itemId,
+        name: ctx.itemName,
+        price: trackedPrice,
+        markup: ctx.markup,
+        targetPrice: targetMatch.targetPrice,
+        withdrawLink: `https://csgoroll.com/en/withdraw/crypto/csgo?search=${encodeURIComponent(ctx.itemName)}`
+    };
+
   } else {
     // General range tracking
     if (trackedPrice >= range.min && trackedPrice <= range.max) {
       processedItems.add(ctx.itemId);
     }
   }
+  
+  return null;
 };

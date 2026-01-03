@@ -7,6 +7,7 @@ import type {
   TargetItem,
 } from "@/types";
 import { processItemMatch } from "./itemMatcher";
+import { sendBatchTelegramAlert, type BatchAlertItem } from "@/notifier/telegram";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -62,6 +63,7 @@ export class CrawlerEngine {
   }
 
   private async processCycle() {
+    this.processedItems.clear();
     const data = await storageHelper.get([
       "priceRanges",
       "intervals",
@@ -124,6 +126,9 @@ export class CrawlerEngine {
         console.log("Processing items:", items.length);
         console.log("Processing items:", items);
 
+        // Batch collection for this page
+        const pageMatches: BatchAlertItem[] = [];
+
         for (const edge of items) {
           const item = edge.node;
           const tradeValue = item.totalValue;
@@ -149,7 +154,9 @@ export class CrawlerEngine {
 
             console.log("Processing item match:", itemName, tradeValue);
 
-            await processItemMatch(
+            console.log("Processing item match:", itemName, tradeValue);
+
+            const matchResult = await processItemMatch(
               {
                 tradeValue,
                 itemName,
@@ -158,10 +165,19 @@ export class CrawlerEngine {
               },
               targetItems,
               this.processedItems,
-              telegramConfig,
               range,
             );
+            
+            if (matchResult) {
+                pageMatches.push(matchResult);
+            }
           }
+        }
+        
+        // Send batch alert if any matches found in this page
+        if (pageMatches.length > 0) {
+            console.log(`Sending batch alert for ${pageMatches.length} items`);
+            await sendBatchTelegramAlert(pageMatches, telegramConfig);
         }
 
         hasNextPage = trades.pageInfo?.hasNextPage;

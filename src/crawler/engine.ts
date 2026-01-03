@@ -14,11 +14,19 @@ export class CrawlerEngine {
   private isRunning: boolean = false;
   private shouldStop: boolean = false;
   private processedItems: Set<string> = new Set();
+  
+  // Status Tracking
+  private nextCycleTime: number | null = null;
+  private cycles: number = 0;
 
   async start() {
     if (this.isRunning) return;
     this.isRunning = true;
     this.shouldStop = false;
+    this.shouldStop = false;
+    this.nextCycleTime = null; // null means "Scanning"
+    this.cycles = 0;
+    this.broadcastStatus();
 
     while (!this.shouldStop) {
       try {
@@ -28,11 +36,29 @@ export class CrawlerEngine {
         await sleep(60000);
       }
     }
+
     this.isRunning = false;
+    this.broadcastStatus();
   }
 
   stop() {
     this.shouldStop = true;
+    this.broadcastStatus();
+  }
+
+  private broadcastStatus() {
+    try {
+      chrome.runtime.sendMessage({
+        type: "CRAWLER_STATUS",
+        payload: {
+          isRunning: this.isRunning,
+          nextCycleTime: this.nextCycleTime,
+          cycles: this.cycles,
+        },
+      });
+    } catch {
+      // Ignore extension context errors
+    }
   }
 
   private async processCycle() {
@@ -64,7 +90,15 @@ export class CrawlerEngine {
       await this.processRange(range, intervals, telegramConfig, targetItems);
       await sleep(intervals.rangeInterval * 1000);
     }
-    await sleep(intervals.cycleDelay * 60 * 1000);
+    const delayDuration = intervals.cycleDelay * 60 * 1000;
+    this.nextCycleTime = Date.now() + delayDuration;
+    this.broadcastStatus();
+    
+    await sleep(delayDuration);
+    
+    this.cycles++;
+    this.nextCycleTime = null; // Back to Scanning
+    this.broadcastStatus();
   }
 
   private async processRange(

@@ -16,8 +16,7 @@ This is a Chrome Extension designed to crawl and track item prices on [CSGORoll]
 - **Framework**: [React 19](https://react.dev/)
 - **Build Tool**: [Vite](https://vitejs.dev/) with [@crxjs/vite-plugin](https://crxjs.dev/vite-plugin)
 - **Language**: [TypeScript](https://www.typescriptlang.org/)
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
-- **State Management**: [Zustand](https://zustand-demo.pmnd.rs/)
+- [Tailwind CSS](https://tailwindcss.com/)
 - **Data Fetching**: [TanStack Query](https://tanstack.com/query/latest)
 - **Icons**: [Lucide React](https://lucide.dev/)
 
@@ -35,7 +34,6 @@ src/
 │   └── itemMatcher.ts  # Logic to match items against targets
 ├── hooks/           # Custom React Hooks
 ├── notifier/        # Notification services (Telegram)
-├── store/           # Zustand stores
 ├── utils/           # Utility functions
 ├── background.ts    # Chrome Extension Service Worker (Entry point for crawler)
 ├── content.ts       # Content scripts (if any)

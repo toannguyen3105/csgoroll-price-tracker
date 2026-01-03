@@ -75,9 +75,20 @@ export interface ScannedItemPayload {
   timestamp?: string;
 }
 
+export interface CrawlerStatus {
+  isRunning: boolean;
+  nextCycleTime: number | null;
+  cycles: number;
+}
+
+export interface CrawlerStatusMessage {
+  type: "CRAWLER_STATUS";
+  payload: CrawlerStatus;
+}
+
 export interface ItemScannedMessage {
   type: "ITEM_SCANNED";
   payload: ScannedItemPayload;
 }
 
-export type RuntimeMessage = ItemScannedMessage;
+export type RuntimeMessage = ItemScannedMessage | CrawlerStatusMessage;

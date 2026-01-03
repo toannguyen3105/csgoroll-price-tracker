@@ -1,12 +1,19 @@
 import { useTranslation } from "react-i18next";
 import { LanguageSwitcher } from "../LanguageSwitcher";
 import { cn } from "@/utils/cn";
+import type { Language } from "@/types";
 
 interface AppHeaderProps {
   isCollapsed?: boolean;
+  language: Language;
+  setLanguage: (lang: Language) => void;
 }
 
-export const AppHeader = ({ isCollapsed }: AppHeaderProps) => {
+export const AppHeader = ({
+  isCollapsed,
+  language,
+  setLanguage,
+}: AppHeaderProps) => {
   const { t } = useTranslation();
 
   return (
@@ -45,7 +52,9 @@ export const AppHeader = ({ isCollapsed }: AppHeaderProps) => {
         )}
       </div>
 
-      {!isCollapsed && <LanguageSwitcher />}
+      {!isCollapsed && (
+        <LanguageSwitcher language={language} setLanguage={setLanguage} />
+      )}
     </header>
   );
 };

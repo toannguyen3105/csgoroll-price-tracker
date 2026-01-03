@@ -1,11 +1,16 @@
 import { Globe } from "lucide-react";
 
 import type { Language } from "@/types";
-import { useConfigStore } from "@/store/useConfigStore";
 
-export const LanguageSwitcher = () => {
-  const { language, setLanguage } = useConfigStore();
+interface LanguageSwitcherProps {
+  language: Language;
+  setLanguage: (lang: Language) => void;
+}
 
+export const LanguageSwitcher = ({
+  language,
+  setLanguage,
+}: LanguageSwitcherProps) => {
   const toggleLanguage = () => {
     const newLang: Language = language === "en" ? "vi" : "en";
     setLanguage(newLang);

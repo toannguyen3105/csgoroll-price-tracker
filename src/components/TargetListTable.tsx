@@ -1,12 +1,11 @@
 import { useTranslation } from "react-i18next";
 import { Trash2, Edit2, Play, Pause } from "lucide-react";
-import type { TargetItem } from "@/types";
+import type { LiveItem, TargetItem } from "@/types";
 import { cn } from "@/utils";
-import { useConfigStore } from "@/store/useConfigStore";
-import { useShallow } from "zustand/react/shallow";
 
 interface TargetListTableProps {
   items: TargetItem[];
+  liveResults: LiveItem[];
   onToggle: (id: string) => void;
   onDelete: (id: string) => void;
   onEdit: (item: TargetItem) => void;
@@ -14,12 +13,12 @@ interface TargetListTableProps {
 
 export const TargetListTable = ({
   items,
+  liveResults,
   onToggle,
   onDelete,
   onEdit,
 }: TargetListTableProps) => {
   const { t } = useTranslation();
-  const liveResults = useConfigStore(useShallow((state) => state.liveResults));
 
   const getCurrentPrice = (targetName: string) => {
     // Find the most recent match for this item in live results

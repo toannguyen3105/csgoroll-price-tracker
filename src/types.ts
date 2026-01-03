@@ -41,6 +41,7 @@ export interface AppState {
   intervals: Intervals;
   telegramConfig: TelegramConfig;
   targetItems: TargetItem[];
+  language?: Language;
 }
 
 export type AppTab = "settings" | "monitor" | "targets";

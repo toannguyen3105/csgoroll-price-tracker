@@ -8,86 +8,48 @@ import {
   SettingsTab,
   TargetItemManager,
 } from "@/components";
-import { useCrawlerListener } from "@/hooks";
+import { useChromeStorage, useLiveFeed } from "@/hooks";
 import "@/i18n";
-import { storageHelper } from "@/storage_helper";
-import { useConfigStore } from "@/store";
-import type {
-  AppState,
-  Intervals,
-  TelegramConfig as ITelegramConfig,
-  PriceRange,
-  TargetItem,
-  AppTab,
-  SaveStatus,
-} from "@/types";
+import i18n from "@/i18n/config";
+import type { AppTab } from "@/types";
 import { cn } from "@/utils";
 
 const App = () => {
   const [activeTab, setActiveTab] = useState<AppTab>("monitor");
-  const [loading, setLoading] = useState(true);
-  const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
-  const _hasHydrated = useConfigStore((state) => state._hasHydrated);
+  const { liveResults, clearLiveResults } = useLiveFeed();
 
-  useCrawlerListener();
+  const {
+    loading,
+    saveStatus,
+    priceRanges,
+    setPriceRanges,
+    intervals,
+    setIntervals,
+    telegramConfig,
+    setTelegramConfig,
+    targetItems,
+    setTargetItems,
+    saveSettings,
+    language,
+    setLanguage,
+  } = useChromeStorage();
 
-  const [priceRanges, setPriceRanges] = useState<PriceRange[]>([]);
-  const [intervals, setIntervals] = useState<Intervals>({
-    rangeInterval: 10,
-    batchInterval: 10,
-    cycleDelay: 1.1,
-  });
-  const [telegramConfig, setTelegramConfig] = useState<ITelegramConfig>({
-    botToken: "",
-    chatId: "",
-  });
-  const [targetItems, setTargetItems] = useState<TargetItem[]>([]);
-
+  // Sync language with i18n
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        const data = await storageHelper.get([
-          "priceRanges",
-          "intervals",
-          "telegramConfig",
-          "targetItems",
-        ]);
-        if (data.priceRanges) setPriceRanges(data.priceRanges);
-        if (data.intervals) setIntervals(data.intervals);
-        if (data.telegramConfig) setTelegramConfig(data.telegramConfig);
-        if (data.targetItems) setTargetItems(data.targetItems);
-      } catch (error) {
-        console.error("Failed to load settings:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadData();
-  }, []);
-
-  const handleSaveSettings = async () => {
-    setSaveStatus("saving");
-    try {
-      const state: AppState = {
-        priceRanges,
-        intervals,
-        telegramConfig,
-        targetItems,
-      };
-      await storageHelper.set(state);
-      // Clear live results when settings change
-      useConfigStore.getState().clearLiveResults();
-      setSaveStatus("success");
-      setTimeout(() => setSaveStatus("idle"), 2000);
-    } catch (error) {
-      console.error("Failed to save settings:", error);
-      setSaveStatus("error");
+    if (language) {
+      i18n.changeLanguage(language);
     }
+  }, [language]);
+
+  const handleSave = () => {
+    saveSettings(() => {
+      clearLiveResults();
+    });
   };
 
-  if (loading || !_hasHydrated) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="animate-spin text-blue-500" size={32} />
@@ -104,7 +66,11 @@ const App = () => {
           isSidebarCollapsed ? "w-[70px]" : "w-[260px]"
         )}
       >
-        <AppHeader isCollapsed={isSidebarCollapsed} />
+        <AppHeader
+          isCollapsed={isSidebarCollapsed}
+          language={language}
+          setLanguage={setLanguage}
+        />
         <AppTabs
           activeTab={activeTab}
           setActiveTab={setActiveTab}
@@ -142,14 +108,16 @@ const App = () => {
         <div className="flex-1 overflow-hidden relative z-0">
           {activeTab === "monitor" && (
             <div className="h-full w-full">
-              <LiveDataTableContainer />
+              <LiveDataTableContainer data={liveResults} />
             </div>
           )}
 
           {activeTab === "targets" && (
             <TargetItemManager
               targetItems={targetItems}
+              liveResults={liveResults}
               setTargetItems={setTargetItems}
+              onClearResults={clearLiveResults}
             />
           )}
 
@@ -161,7 +129,7 @@ const App = () => {
               setIntervals={setIntervals}
               telegramConfig={telegramConfig}
               setTelegramConfig={setTelegramConfig}
-              onSave={handleSaveSettings}
+              onSave={handleSave}
               saveStatus={saveStatus}
             />
           )}

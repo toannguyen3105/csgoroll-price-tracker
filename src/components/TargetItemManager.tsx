@@ -2,20 +2,23 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Plus, Search, Upload, Download } from "lucide-react";
 
-import type { TargetItem } from "@/types";
-import { useConfigStore } from "@/store/useConfigStore";
+import type { LiveItem, TargetItem } from "@/types";
 import { storageHelper } from "@/storage_helper";
 import { TargetListTable } from "./TargetListTable";
 import { cn } from "@/utils/cn";
 
 interface Props {
   targetItems: TargetItem[];
+  liveResults: LiveItem[];
   setTargetItems: React.Dispatch<React.SetStateAction<TargetItem[]>>;
+  onClearResults: () => void;
 }
 
 export const TargetItemManager: React.FC<Props> = ({
   targetItems,
+  liveResults,
   setTargetItems,
+  onClearResults,
 }) => {
   const { t } = useTranslation();
   const [newItemName, setNewItemName] = useState("");
@@ -45,7 +48,7 @@ export const TargetItemManager: React.FC<Props> = ({
       ]);
       setNewItemName("");
       setNewItemPrice("");
-      useConfigStore.getState().clearLiveResults();
+      onClearResults();
     }
   };
 
@@ -57,12 +60,12 @@ export const TargetItemManager: React.FC<Props> = ({
           : item
       )
     );
-    useConfigStore.getState().clearLiveResults();
+    onClearResults();
   };
 
   const deleteItem = (id: string) => {
     setTargetItems((prev) => prev.filter((item) => item.id !== id));
-    useConfigStore.getState().clearLiveResults();
+    onClearResults();
   };
 
   const editItem = (item: TargetItem) => {
@@ -130,7 +133,7 @@ export const TargetItemManager: React.FC<Props> = ({
 
       if (newItems.length > 0) {
         setTargetItems((prev) => [...newItems, ...prev]); // Prepend new items
-        useConfigStore.getState().clearLiveResults();
+        onClearResults();
         // Reset input value to allow re-importing same file
         e.target.value = "";
       }
@@ -273,6 +276,7 @@ export const TargetItemManager: React.FC<Props> = ({
         <div className="flex-1 overflow-hidden">
           <TargetListTable
             items={filteredItems}
+            liveResults={liveResults}
             onToggle={toggleItem}
             onDelete={deleteItem}
             onEdit={editItem}

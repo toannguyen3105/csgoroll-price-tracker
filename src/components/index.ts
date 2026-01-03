@@ -6,3 +6,4 @@ export * from "./IntervalSettings";
 export * from "./PriceRangeManager";
 export * from "./TargetItemManager";
 export * from "./TelegramConfig";
+export * from "./SettingsTab";

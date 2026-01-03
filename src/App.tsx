@@ -1,15 +1,12 @@
-import { Loader2, ChevronLeft, ChevronRight, Save, Check } from "lucide-react";
+import { Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
 
 import {
   AppHeader,
   AppTabs,
-  IntervalSettings,
   LiveDataTableContainer,
-  PriceRangeManager,
+  SettingsTab,
   TargetItemManager,
-  TelegramConfig,
 } from "@/components";
 import { useCrawlerListener } from "@/hooks";
 import "@/i18n";
@@ -27,7 +24,6 @@ import type {
 import { cn } from "@/utils";
 
 const App = () => {
-  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<AppTab>("monitor");
   const [loading, setLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
@@ -123,36 +119,7 @@ const App = () => {
             isSidebarCollapsed ? "px-2" : "px-4"
           )}
         >
-          <button
-            onClick={handleSaveSettings}
-            disabled={saveStatus === "saving"}
-            title={isSidebarCollapsed ? t("common.save_settings") : undefined}
-            className={cn(
-              "w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-bold tracking-wide transition-all transform active:scale-[0.98] shadow-lg border",
-              {
-                "bg-emerald-950/40 text-emerald-400 border-emerald-900/50 hover:bg-emerald-900/60 hover:text-emerald-300 shadow-emerald-900/10":
-                  saveStatus === "success",
-                "bg-rose-950/40 text-rose-400 border-rose-900/50 hover:bg-rose-900/60 hover:text-rose-300 shadow-rose-900/10":
-                  saveStatus === "error",
-                "bg-cyan-950/40 text-cyan-400 border-cyan-900/50 hover:bg-cyan-900/60 hover:text-cyan-300 shadow-cyan-900/10":
-                  saveStatus !== "success" && saveStatus !== "error",
-              }
-            )}
-          >
-            {saveStatus === "saving" ? (
-              <Loader2 className="animate-spin" size={18} />
-            ) : saveStatus === "success" ? (
-              isSidebarCollapsed ? (
-                <Check size={18} />
-              ) : (
-                <span>{t("common.saved")}</span>
-              )
-            ) : isSidebarCollapsed ? (
-              <Save size={18} />
-            ) : (
-              t("common.save_settings")
-            )}
-          </button>
+          {/* Footer content removed */}
         </footer>
 
         {/* Floating Sidebar Toggle Button */}
@@ -187,29 +154,16 @@ const App = () => {
           )}
 
           {activeTab === "settings" && (
-            <div className="h-full overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
-              <div className="max-w-3xl mx-auto space-y-6 pb-20">
-                <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6 shadow-sm">
-                  <h2 className="text-lg font-semibold text-slate-100 mb-4 flex items-center gap-2">
-                    Config
-                  </h2>
-                  <div className="space-y-8">
-                    <PriceRangeManager
-                      ranges={priceRanges}
-                      setRanges={setPriceRanges}
-                    />
-                    <IntervalSettings
-                      intervals={intervals}
-                      setIntervals={setIntervals}
-                    />
-                    <TelegramConfig
-                      config={telegramConfig}
-                      setConfig={setTelegramConfig}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
+            <SettingsTab
+              priceRanges={priceRanges}
+              setPriceRanges={setPriceRanges}
+              intervals={intervals}
+              setIntervals={setIntervals}
+              telegramConfig={telegramConfig}
+              setTelegramConfig={setTelegramConfig}
+              onSave={handleSaveSettings}
+              saveStatus={saveStatus}
+            />
           )}
         </div>
       </main>

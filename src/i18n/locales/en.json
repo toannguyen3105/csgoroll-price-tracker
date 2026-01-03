@@ -2,6 +2,7 @@
   "common": {
     "save": "Save",
     "saved": "Saved",
+    "config": "Config",
     "save_settings": "SAVE SETTINGS",
     "cancel": "Cancel",
     "test": "Test",
